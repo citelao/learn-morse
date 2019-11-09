@@ -1,0 +1,26 @@
+{
+  "name": "morse",
+  "version": "1.0.0",
+  "description": "## Development",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "parcel src/index.html"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/react": "^16.9.11",
+    "@types/react-dom": "^16.9.4",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "sass": "^1.23.3",
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "app": "^0.1.0",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0"
+  }
+}
