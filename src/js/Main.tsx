@@ -83,7 +83,8 @@ export default class Main extends React.Component<{}, MainState>
                 hasStarted={this.state.hasStarted}
                 shownWord={shownWord}
                 onBegin={this.handleBegin}
-                onGuess={this.handleGuess} />
+                onGuess={this.handleGuess}
+                onStopRequest={this.handleStopRequest} />
         );
     }
 
@@ -97,6 +98,10 @@ export default class Main extends React.Component<{}, MainState>
     private handleGuess = (char: string) => {
         console.log(char);
         this.state.currentLesson.handleGuess(char);
+    }
+
+    private handleStopRequest = () => {
+        console.log("Stopping!")
     }
 
     private handleLessonStateChange = () => {

@@ -7,7 +7,8 @@ export interface MainViewProperties {
     shownWord: string | null,
 
     onBegin: () => void,
-    onGuess: (char: string) => void
+    onGuess: (char: string) => void,
+    onStopRequest: () => void,
 }
 
 export default class MainView extends React.Component<MainViewProperties>
@@ -23,10 +24,6 @@ export default class MainView extends React.Component<MainViewProperties>
                 onBegin={this.props.onBegin} />;
         }
 
-        const input = (this.props.hasStarted)
-            ? <input onKeyPress={this.handleKeyPress} className="morseInput" />
-            : <button onClick={this.handleBegin} className="startButton">Begin!</button>;
-
         return (
             <section className="main">
                 {
@@ -34,16 +31,17 @@ export default class MainView extends React.Component<MainViewProperties>
                         ? <div className="letter">{this.props.shownWord}</div>
                         : null
                 }
-                {input}
+                <button className="startButton" onClick={this.handleStopRequest}>(stop)</button>
+                <input onKeyPress={this.handleKeyPress} className="morseInput" />
             </section>
         );
     }
 
-    private handleBegin = () => {
-        this.props.onBegin();
-    }
-
     private handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
         this.props.onGuess(e.key);
+    }
+
+    private handleStopRequest = () => {
+        this.props.onStopRequest();
     }
 }
