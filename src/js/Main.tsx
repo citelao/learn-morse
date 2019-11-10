@@ -3,7 +3,7 @@ import React from "react";
 import Scheduler, { INote } from "./audio/Scheduler";
 import { generateMorseNotes } from "./audio/morse";
 import MainView from "./view/MainView";
-import LessonPlan from "./LessonPlan";
+import LessonPlan, { QuizMode } from "./LessonPlan";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -12,13 +12,13 @@ function createAudioContext(): AudioContext {
 interface ICachedLessonState {
     currentWord: string | null;
     wordId: number | null;
-    shouldShowWord: boolean;
+    quizMode: QuizMode;
 }
 function getCachedLessonState(lessonPlan: LessonPlan) {
     const state: ICachedLessonState = {
         currentWord: lessonPlan.getCurrentWord(),
         wordId: lessonPlan.getWordId(),
-        shouldShowWord: lessonPlan.getShouldShowCurrentWord()
+        quizMode: lessonPlan.getQuizMode(),
     };
     return state;
 }
@@ -73,15 +73,31 @@ export default class Main extends React.Component<{}, MainState>
         }
     }
 
+    private getStatusMessage(): string | null {
+        if (!this.state.cachedLessonState) {
+            return null;
+        }
+
+        switch(this.state.cachedLessonState.quizMode) {
+            case QuizMode.VisibleSingle:
+                // fallthrough
+            case QuizMode.InvisibleSingle:
+                return "(type the letter you hear)";
+            case QuizMode.InvisibleWords:
+                return "(type the words you hear)";
+        }
+    }
+
     render()
     {
-        const shownWord = (this.state.cachedLessonState && this.state.cachedLessonState.shouldShowWord)
+        const shownWord = (this.state.cachedLessonState && this.state.cachedLessonState.quizMode === QuizMode.VisibleSingle)
             ? this.state.cachedLessonState.currentWord
             : null;
         return (
             <MainView
                 hasStarted={this.state.hasStarted}
                 shownWord={shownWord}
+                statusMessage={this.getStatusMessage()}
                 onBegin={this.handleBegin}
                 onGuess={this.handleGuess}
                 onStopRequest={this.handleStopRequest} />
@@ -110,7 +126,7 @@ export default class Main extends React.Component<{}, MainState>
         } else {
             this.state.currentLesson.handleGuess(char);
         }
-        
+
         return false;
     }
 

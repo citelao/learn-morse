@@ -5,6 +5,7 @@ export interface MainViewProperties {
     hasStarted: boolean,
 
     shownWord: string | null,
+    statusMessage: string | null,
 
     onBegin: () => void,
     onGuess: (char: string) => boolean,
@@ -47,6 +48,11 @@ export default class MainView extends React.Component<MainViewProperties>
                     autoCorrect="off"
                     autoCapitalize="off"
                     ref={this.inputRef} />
+                {
+                    (this.props.statusMessage) 
+                        ? <div className="status">{this.props.statusMessage}</div>
+                        : null
+                }
                 <button className="startButton" onClick={this.handleStopRequest}>(stop)</button>
             </section>
         );

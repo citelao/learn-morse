@@ -12,7 +12,6 @@ export interface ILessonPlanState {
 
     currentWord: string | null,
     wordId: number | null,
-    shouldShowWord: boolean,
     currentGuess: string,
 }
 
@@ -40,7 +39,6 @@ function generateWordForLesson(currentLesson: number): string {
 /** Internal interface for generating words */
 interface INewWord {
     word: string;
-    shouldShowWord: boolean;
 }
 
 export default class LessonPlan {
@@ -54,7 +52,6 @@ export default class LessonPlan {
             quizMode: QuizMode.VisibleSingle,
             currentWord: null,
             wordId: null,
-            shouldShowWord: false,
             currentGuess: "",
         });
     }
@@ -72,10 +69,6 @@ export default class LessonPlan {
         return this.state.wordId
     }
 
-    public getShouldShowCurrentWord(): boolean {
-        return this.state.shouldShowWord;
-    }
-
     public getQuizMode(): QuizMode {
         return this.state.quizMode;
     }
@@ -88,7 +81,6 @@ export default class LessonPlan {
         const newWord = this.getNewWord();
         this.state.currentWord = newWord.word;
         this.state.wordId = 0;
-        this.state.shouldShowWord = newWord.shouldShowWord;
         this.updateListeners();
     }
 
@@ -114,7 +106,6 @@ export default class LessonPlan {
                 // Generate a new word:
                 const newWord = this.getNewWord();
                 this.state.currentWord = newWord.word;
-                this.state.shouldShowWord = newWord.shouldShowWord;
                 this.state.wordId = this.state.wordId! + 1;
                 this.state.currentGuess = "";
             } else {
@@ -135,7 +126,6 @@ export default class LessonPlan {
         
         const newWord: INewWord = {
             word: word,
-            shouldShowWord: (this.state.quizMode === QuizMode.VisibleSingle)
         };
         return newWord;
     }
