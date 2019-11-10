@@ -16,19 +16,18 @@ export default class PhrasePracticeView extends React.Component<PhrasePracticeVi
             <section className="main">
                 <h1>Learning phrases</h1>
                 <p>
-                    This first lesson is about <em>understanding Morse</em>
-                    and its timings.
+                    With 2 letters down, it's time to dive into <strong>phrases</strong>.
                 </p>
                 <p>
-                    You will hear five different 5-character words with random letters.
-                    Each time you hear a character, type a key on the keyboard
-                    (it doesn't matter which one).
+                    You will hear five different 5-letter words at full speed.
+                    Don't worry! It's just 2 letters (for now),
+                    and the space between words is lengthened.
                 </p>
                 <p>
-                    When you hear a space, type a space.
+                    Type the letters as you hear them. When you hear a space, type a space.
                 </p>
                 <p>
-                    Once you get the flow, we will actually name some of the letters.
+                    When you have typed all five words, you'll see how you did.
                 </p>
                 <button onClick={this.handleBegin} className="startButton">Get started!</button>
             </section>
