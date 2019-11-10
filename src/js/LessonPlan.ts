@@ -98,7 +98,7 @@ export default class LessonPlan {
     public begin() {
         const newWord = this.getNewWord();
         this.state.currentWord = newWord.word;
-        this.state.wordId = (this.state.wordId || -1) + 1;
+        this.state.wordId = (this.state.wordId || 0) + 1;
         this.state.currentGuess = "";
         this.updateListeners();
     }
