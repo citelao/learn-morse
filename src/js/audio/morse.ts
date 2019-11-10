@@ -47,50 +47,31 @@ export interface ISpeeds {
 }
 
 export function getSpeeds(wordsPerMinute: number): ISpeeds {
-    // Assumptions:
-    // const lettersPerWord = 5;
-    // const pointsPerLetter = 4
-    // const ditsVersusDartsPercentage = 0.5;
-
-    // For:
-    // - `n` wpm,
-    // - `l` letters per word,
-    // - `p` points per letter,
-    // - `d` dits versus darts percentage (decimal)
+    // Use the standard word `PARIS`:
+    // - 10 DIT
+    // - 4 DART
+    // - 9 INTER_SYMBOL
+    // - 4 INTER_CHAR
+    // - (1 INTER_WORD)
     //
-    // Letter duration:
-    // `j = (d * p * DIT_DURATION + (1 - d) * p * DART_DURATION) + (p - 1) * INTER_SYMBOL_DURATION`
-    //
-    // Word duration:
-    // `k = j * l + (l - 1) * INTER_CHARACTER_DURATION`
-    //
-    // Words per minute:
-    // `60sec = n * k + (n - 1) * INTER_WORD_DURATION`
-    //
-    // Solve for n:
-    //
-    // 60sec = n * k + n * INTER_WORD_DURATION - INTER_WORD_DURATION
-    // => 60sec = n * (k + INTER_WORD_DURATION) - INTER_WORD_DURATION
-    // => (60sec + INTER_WORD_DURATION) / (k + INTER_WORD_DURATION) = n
-    //
-    // Expand `k`:
-    //
-    // n = (60sec + INTER_WORD_DURATION) / (k + INTER_WORD_DURATION)
-    // n = (60sec + INTER_WORD_DURATION) / ((j * l + (l - 1) * INTER_CHARACTER_DURATION) + INTER_WORD_DURATION)
-    // n = (60sec + INTER_WORD_DURATION) / ((((d * p * DIT_DURATION + (1 - d) * p * DART_DURATION) + (p - 1) * INTER_SYMBOL_DURATION) * l + (l - 1) * INTER_CHARACTER_DURATION) + INTER_WORD_DURATION)
-    //
-    // Great, now use the ratios of spacing:
+    // With the ratios of spacing:
     // - DIT_DURATION = 1tu
     // - DART_DURATION = 3tu
-    // - INTER_POINT_DURATION = 1tu
+    // - INTER_SYMBOL_DURATION = 1tu
     // - INTER_CHARACTER_DURATION = 3tu
     // - INTER_WORD_DURATION = 7tu
     //
-    // Solving on paper:
-    const unitsPerMinute = 74 * wordsPerMinute - 7;
-    const minutesPerUnite = 1 / unitsPerMinute;
+    //   10 + 4 * 3 + 9 + 4 * 3
+    // = 10 + 12 + 9 + 12 = 43
+    //
+    // + Word = 50tu.
+    //
+    // Therefore, units per minute = words per minute * 50(tu/word)
+    // Therefore, length of unit = 60(s/min) / (WPM * 50(tu/word))
+    //
+    const unitsPerWord = 50;
     const secondsPerMinute = 60;
-    const secondsPerUnit = secondsPerMinute * minutesPerUnite;
+    const secondsPerUnit = secondsPerMinute / (wordsPerMinute * unitsPerWord);
 
     const speeds: ISpeeds = {
         dit_duration_seconds: secondsPerUnit,
@@ -104,9 +85,13 @@ export function getSpeeds(wordsPerMinute: number): ISpeeds {
 
 export function getKochSpeeds(codingWordsPerMinute: number, effectiveWordsPerMinute: number): ISpeeds {
     const codingSpeeds = getSpeeds(codingWordsPerMinute);
+    
+    const unitsPerWord = 50;
+    const codingTimePerMinute = effectiveWordsPerMinute * unitsPerWord * codingSpeeds.dit_duration_seconds;
 
-    const inter_word_duration = (60 - (67 * codingSpeeds.dit_duration_seconds * effectiveWordsPerMinute))
-        / (7 * (effectiveWordsPerMinute - 1))
+    const secondsPerMinute = 60;
+    const freeTimePerMinute = secondsPerMinute - codingTimePerMinute;
+    const inter_word_duration = freeTimePerMinute / effectiveWordsPerMinute;
 
     const speeds: ISpeeds = {
         dit_duration_seconds: codingSpeeds.dit_duration_seconds,
