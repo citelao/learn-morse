@@ -22,7 +22,8 @@ export default class Scheduler {
     }
 
     public start() {
-        this.window.requestAnimationFrame(this.handleAnimationFrame);
+        // this.window.requestAnimationFrame(this.handleAnimationFrame);
+        setTimeout(this.handleAnimationFrame, 0);
     }
 
     public scheduleNotes(notes: INote[], options?: { shouldSortNotes?: boolean}) {
@@ -53,6 +54,7 @@ export default class Scheduler {
             console.log(frameTime);
         }
 
-        this.window.requestAnimationFrame(this.handleAnimationFrame);
+        // this.window.requestAnimationFrame(this.handleAnimationFrame);
+        setTimeout(this.handleAnimationFrame, 0);
     }
 }
