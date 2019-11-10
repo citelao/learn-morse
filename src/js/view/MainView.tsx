@@ -1,11 +1,13 @@
 import React from "react";
 import BeginView from "./BeginView";
+import { IGuess } from "../LessonPlan";
 
 export interface MainViewProperties {
     hasStarted: boolean,
 
     shownWord: string | null,
     currentGuess: string,
+    guessHistory: IGuess[],
     statusMessage: string | null,
 
     onBegin: () => void,
@@ -36,8 +38,17 @@ export default class MainView extends React.Component<MainViewProperties>
                 onBegin={this.props.onBegin} />;
         }
 
+        const guessHistory = <ol>
+            {this.props.guessHistory.map((guess) => {
+                return <li>
+                    {guess.guess}
+                </li>;
+            })}
+        </ol>;
+
         return (
             <section className="main">
+                {guessHistory}
                 {
                     (this.props.shownWord) 
                         ? <div className="letter">{this.props.shownWord}</div>

@@ -3,7 +3,7 @@ import React from "react";
 import Scheduler, { INote } from "./audio/Scheduler";
 import { generateMorseNotes, INTER_WORD_DURATION, getKochSpeeds } from "./audio/morse";
 import MainView from "./view/MainView";
-import LessonPlan, { QuizMode } from "./LessonPlan";
+import LessonPlan, { QuizMode, IGuess } from "./LessonPlan";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -13,6 +13,7 @@ interface ICachedLessonState {
     currentWord: string | null;
     wordId: number | null;
     currentGuess: string;
+    guessHistory: IGuess[];
     quizMode: QuizMode;
 }
 function getCachedLessonState(lessonPlan: LessonPlan) {
@@ -20,6 +21,7 @@ function getCachedLessonState(lessonPlan: LessonPlan) {
         currentWord: lessonPlan.getCurrentWord(),
         wordId: lessonPlan.getWordId(),
         currentGuess: lessonPlan.getCurrentGuess(),
+        guessHistory: lessonPlan.getGuessHistory(),
         quizMode: lessonPlan.getQuizMode(),
     };
     return state;
@@ -97,12 +99,18 @@ export default class Main extends React.Component<{}, MainState>
         const shownWord = (this.state.cachedLessonState && this.state.cachedLessonState.quizMode === QuizMode.VisibleSingle)
             ? this.state.cachedLessonState.currentWord
             : null;
+
+        const guessHistory = this.state.cachedLessonState?.guessHistory || [];
+        const trimmedHistory = (guessHistory.length > 5)
+            ? guessHistory.slice(guessHistory.length - 5, guessHistory.length)
+            : guessHistory;
         return (
             <MainView
                 hasStarted={this.state.hasStarted}
                 shownWord={shownWord}
                 statusMessage={this.getStatusMessage()}
                 currentGuess={this.state.cachedLessonState?.currentGuess || ""}
+                guessHistory={trimmedHistory}
                 onBegin={this.handleBegin}
                 onGuess={this.handleGuess}
                 onStopRequest={this.handleStopRequest} />

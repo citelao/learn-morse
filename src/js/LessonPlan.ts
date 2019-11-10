@@ -4,6 +4,10 @@ export enum QuizMode {
     InvisibleWords = 3,
 }
 
+export interface IGuess {
+    guess: string;
+}
+
 /** LessonPlan is designed to be trivially serializable to JSON. */
 export interface ILessonPlanState {
     currentLesson: number,
@@ -14,6 +18,8 @@ export interface ILessonPlanState {
     currentPhrase: string[] | null,
     wordId: number | null,
     currentGuess: string,
+
+    guessHistory: IGuess[]
 }
 
 export type LessonPlanStateChangeListener = () => void;
@@ -55,6 +61,7 @@ export default class LessonPlan {
             wordId: null,
             currentPhrase: null,
             currentGuess: "",
+            guessHistory: [],
         });
     }
 
@@ -79,6 +86,10 @@ export default class LessonPlan {
         return this.state.quizMode;
     }
 
+    public getGuessHistory(): IGuess[] {
+        return this.state.guessHistory;
+    }
+
     public registerListener(callback: LessonPlanStateChangeListener) {
         this.listeners.push(callback);
     }
@@ -93,6 +104,10 @@ export default class LessonPlan {
     public handleGuess(guess: string) {
         this.state.currentGuess = guess;
         if(this.state.currentGuess.length === this.state.currentWord?.length) {
+            this.state.guessHistory.push({
+                guess: this.state.currentGuess
+            });
+
             if (this.state.currentGuess == this.state.currentWord) {
                 // On success.
 
