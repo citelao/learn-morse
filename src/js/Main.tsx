@@ -109,8 +109,9 @@ export default class Main extends React.Component<{}, MainState>
             }
         } else {
             this.state.currentLesson.handleGuess(char);
-            return false;
         }
+        
+        return false;
     }
 
     private handleStopRequest = () => {

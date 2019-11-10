@@ -45,7 +45,7 @@ export default class LessonPlan {
     public static create() {
         // Create a basic LessonPlan
         return new LessonPlan({
-            currentLesson: 3,
+            currentLesson: 1,
             isIntroducing: true,
             isSoftlyIntroducing: false,
             currentWord: null,
@@ -88,13 +88,23 @@ export default class LessonPlan {
         this.state.currentGuess += char;
         if(this.state.currentGuess.length === this.state.currentWord?.length) {
             if (this.state.currentGuess == this.state.currentWord) {
-                // On success:
+                // On success.
+
+                // Update the state:
                 if (this.state.isIntroducing && !this.state.isSoftlyIntroducing) {
                     this.state.isSoftlyIntroducing = true;
+
+                    // Special-case the first letter, since we already just learned it.
+                    if (this.state.currentLesson === 1) {
+                        this.state.currentLesson += 1;
+                        this.state.isIntroducing = true;
+                        this.state.isSoftlyIntroducing = false;
+                    }
                 } else if(this.state.isIntroducing) {
                     this.state.isIntroducing = false;
                 }
 
+                // Generate a new word:
                 const newWord = this.getNewWord();
                 this.state.currentWord = newWord.word;
                 this.state.shouldShowWord = newWord.shouldShowWord;
