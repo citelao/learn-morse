@@ -3,10 +3,12 @@ type NoteCallback = (currentTime: number) => void;
 export interface INote {
     timeFromNowInSeconds: number;
     callback: NoteCallback;
+    cancellationCallback?: NoteCallback;
 }
 
 interface IQueuedNote {
     callback: NoteCallback;
+    cancellationCallback?: NoteCallback;
     startTime: number;
 }
 
@@ -39,6 +41,7 @@ export default class Scheduler {
         notes.forEach((note) => {
             const scheduledNote: IQueuedNote = {
                 callback: note.callback,
+                cancellationCallback: note.cancellationCallback,
                 startTime: currentTime + note.timeFromNowInSeconds
             };
             this.queuedNotes.push(scheduledNote);
@@ -47,7 +50,12 @@ export default class Scheduler {
     }
 
     public clear() {
-        // TODO: this cannot cancel notes well. We need to shut off all oscillators.
+        const frameTime = this.audioContext.currentTime;
+        this.queuedNotes.forEach((note) => {
+            if(note.cancellationCallback) {
+                note.cancellationCallback(frameTime);
+            }
+        })
         this.queuedNotes = [];
     }
 

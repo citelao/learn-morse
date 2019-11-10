@@ -46,7 +46,7 @@ export default class LessonPlan {
         // Create a basic LessonPlan
         return new LessonPlan({
             currentLesson: 2,
-            isIntroducing: true,
+            isIntroducing: false,
             isSoftlyIntroducing: false,
             currentWord: null,
             wordId: null,

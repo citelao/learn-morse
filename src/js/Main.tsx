@@ -102,6 +102,7 @@ export default class Main extends React.Component<{}, MainState>
 
     private handleStopRequest = () => {
         console.log("Stopping!")
+        this.scheduler.clear();
     }
 
     private handleLessonStateChange = () => {

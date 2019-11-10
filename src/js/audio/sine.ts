@@ -47,12 +47,14 @@ export function generateSineNote(options: {
     const oscillator = createPleasantSineOscillator(options.context, options.frequencyInHertz);
     oscillator.gain.connect(options.context.destination);
 
+    let wasStarted = false;
     return [
         {
             timeFromNowInSeconds: timeFromNowInSeconds,
             callback: (currentTime) => {
                 oscillator.gain.gain.setValueAtTime(EPSILON, currentTime);
                 oscillator.gain.gain.exponentialRampToValueAtTime(1, currentTime + 0.05);
+                wasStarted = true;
             }
         },
         {
@@ -60,6 +62,12 @@ export function generateSineNote(options: {
             callback: (currentTime) => {
                 oscillator.gain.gain.setValueAtTime(oscillator.gain.gain.value, currentTime);
                 oscillator.gain.gain.exponentialRampToValueAtTime(EPSILON, currentTime + 0.05);
+            },
+            cancellationCallback: (currentTime) => {
+                if (wasStarted) {
+                    oscillator.gain.gain.setValueAtTime(oscillator.gain.gain.value, currentTime);
+                    oscillator.gain.gain.exponentialRampToValueAtTime(EPSILON, currentTime + 0.05);
+                }
             }
         },
     ];
