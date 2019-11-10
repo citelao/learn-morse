@@ -103,16 +103,13 @@ export default class Main extends React.Component<{}, MainState>
             : null;
 
         const guessHistory = this.state.cachedLessonState?.guessHistory || [];
-        const trimmedHistory = (guessHistory.length > 5)
-            ? guessHistory.slice(guessHistory.length - 5, guessHistory.length)
-            : guessHistory;
         return (
             <MainView
                 hasStarted={this.state.hasStarted}
                 shownWord={shownWord}
                 statusMessage={this.getStatusMessage()}
                 currentGuess={this.state.cachedLessonState?.currentGuess || ""}
-                guessHistory={trimmedHistory}
+                guessHistory={guessHistory}
                 onBegin={this.handleBegin}
                 onGuess={this.handleGuess}
                 onStopRequest={this.handleStopRequest} />
