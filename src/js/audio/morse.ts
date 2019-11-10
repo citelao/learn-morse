@@ -105,24 +105,9 @@ export function getSpeeds(wordsPerMinute: number): ISpeeds {
 export function getKochSpeeds(codingWordsPerMinute: number, effectiveWordsPerMinute: number): ISpeeds {
     const codingSpeeds = getSpeeds(codingWordsPerMinute);
 
-    const symbolsPerLetter = 4
-    const ditsVersusDartsPercentage = 0.5;
-    const letterDuration = (
-        (
-            (symbolsPerLetter * ditsVersusDartsPercentage * codingSpeeds.dit_duration_seconds)
-            - (symbolsPerLetter * (1 - ditsVersusDartsPercentage) * codingSpeeds.dart_duration_seconds)
-        ) + (symbolsPerLetter - 1) * codingSpeeds.inter_symbol_duration_seconds
-    );
+    const inter_word_duration = (60 - (67 * codingSpeeds.dit_duration_seconds * effectiveWordsPerMinute))
+        / (7 * (effectiveWordsPerMinute - 1))
 
-    const lettersPerWord = 5;
-    const wordDuration = lettersPerWord * letterDuration + (lettersPerWord - 1) * codingSpeeds.inter_word_duration_seconds;
-    
-    const totalWordDuration = wordDuration * effectiveWordsPerMinute;
-    const totalWordPauses = 1 - totalWordDuration;
-
-    // TODO: this is buggy.
-    // const inter_word_duration = totalWordPauses / (1 - effectiveWordsPerMinute);
-    const inter_word_duration = 2;
     const speeds: ISpeeds = {
         dit_duration_seconds: codingSpeeds.dit_duration_seconds,
         dart_duration_seconds: codingSpeeds.dart_duration_seconds,
