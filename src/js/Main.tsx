@@ -3,8 +3,9 @@ import React from "react";
 import Scheduler, { INote } from "./audio/Scheduler";
 import { generateMorseNotes, INTER_WORD_DURATION, getKochSpeeds } from "./audio/morse";
 import MainView from "./view/MainView";
-import LessonPlan, { QuizMode, IGuess } from "./LessonPlan";
+import LessonPlan, { QuizMode, IGuess, getLettersForLesson } from "./LessonPlan";
 import ListeningTutorialView from "./view/ListeningTutorialView";
+import PhrasePracticeView from "./view/PhrasePracticeView";
 import BeginView from "./view/BeginView";
 import IntroduceLetter from "./IntroduceLetter";
 
@@ -42,8 +43,15 @@ type AppState =
 
 const ENABLE_LISTENING_PRACTICE = false;
 
+// Replaces `lessonPlan`.
+interface LearningState {
+    currentLesson: number,
+}
+
 interface MainState {
     appState: AppState,
+
+    learningState: LearningState,
 
     currentLesson: LessonPlan,
     cachedLessonState: ICachedLessonState | null
@@ -53,6 +61,9 @@ export default class Main extends React.Component<{}, MainState>
 {
     state: MainState = {
         appState: "unstarted",
+        learningState: {
+            currentLesson: 1
+        },
         currentLesson: LessonPlan.create(),
         cachedLessonState: null
     };
@@ -135,10 +146,15 @@ export default class Main extends React.Component<{}, MainState>
             case "introduce_listening":
                 return this.renderListeningPractice();
             case "introduce_letter":
+                const availableLetters = getLettersForLesson(this.state.learningState.currentLesson);
+                const currentLetter = availableLetters[availableLetters.length - 1];
                 return <IntroduceLetter
-                    letter="k"
+                    letter={currentLetter}
                     onRequestRenderMorse={this.renderMorse}
-                    onStopRequest={this.handleStopRequest} />;
+                    onStopRequest={this.handleStopRequest}
+                    onSuccess={this.handleSuccess} />;
+            case "tutorial_phrase_practice":
+                return <PhrasePracticeView onBegin={this.handleBegin} />;
             default:
                 // Nothing.
         }
@@ -197,7 +213,29 @@ export default class Main extends React.Component<{}, MainState>
         }
     }
 
+    private handleSuccess = () => {
+        if (this.state.appState === "introduce_letter") {
+            // Special case learning the first letters:
+            if (this.state.learningState.currentLesson === 1) {
+                this.setState({
+                    learningState: {
+                        currentLesson: this.state.learningState.currentLesson + 1
+                    }
+                });
+            } else if (this.state.learningState.currentLesson === 2) {
+                this.setState({
+                    appState: "tutorial_phrase_practice"
+                });
+            } else {
+                this.setState({
+                    appState: "phrase_practice"
+                });
+            }
+        }
+    }
+
     private renderMorse = (phrase: string) => {
+        console.log(`Rendering ${phrase}`);
         const notes = generateMorseNotes(this.audioContext, phrase);
         this.scheduler.clear();
         this.scheduler.scheduleNotes(notes);

@@ -29,8 +29,13 @@ const LETTER_SERIES = [
     "u"
 ];
 
-function generateWordForLesson(currentLesson: number): string {
+export function getLettersForLesson(currentLesson: number): string[] {
     const availableLetters = LETTER_SERIES.slice(0, currentLesson);
+    return availableLetters;
+}
+
+function generateWordForLesson(currentLesson: number): string {
+    const availableLetters = getLettersForLesson(currentLesson);
 
     const LENGTH = 5;
     let word = "";

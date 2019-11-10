@@ -6,6 +6,8 @@ export interface IntroduceLetterProperties {
     
     onRequestRenderMorse: (phrase: string) => void,
     onStopRequest: () => void,
+
+    onSuccess: () => void,
 }
 
 interface IntroduceLetterState {
@@ -24,6 +26,12 @@ export default class IntroduceLetter extends React.Component<IntroduceLetterProp
 
     componentDidMount() {
         this.props.onRequestRenderMorse(this.props.letter);
+    }
+
+    componentDidUpdate(prevProps: IntroduceLetterProperties) {
+        if (prevProps.letter != this.props.letter) {
+            this.props.onRequestRenderMorse(this.props.letter);
+        }
     }
 
     render()
@@ -47,6 +55,7 @@ export default class IntroduceLetter extends React.Component<IntroduceLetterProp
         }
 
         if (complete_guess === this.props.letter) {
+            this.props.onSuccess();
         }
 
         // TODO: unnecessary.
