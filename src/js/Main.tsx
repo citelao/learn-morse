@@ -5,9 +5,10 @@ import { generateMorseNotes, INTER_WORD_DURATION, getKochSpeeds } from "./audio/
 import MainView from "./view/MainView";
 import LessonPlan, { QuizMode, IGuess, getLettersForLesson } from "./LessonPlan";
 import ListeningTutorialView from "./view/ListeningTutorialView";
-import PhrasePracticeView from "./view/PhrasePracticeView";
+import PhrasePracticeTutorialView from "./view/PhrasePracticeTutorialView";
 import BeginView from "./view/BeginView";
 import IntroduceLetter from "./IntroduceLetter";
+import PhrasePractice from "./PhrasePractice";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -154,25 +155,15 @@ export default class Main extends React.Component<{}, MainState>
                     onStopRequest={this.handleStopRequest}
                     onSuccess={this.handleSuccess} />;
             case "tutorial_phrase_practice":
-                return <PhrasePracticeView onBegin={this.handleBegin} />;
+                return <PhrasePracticeTutorialView onBegin={this.handleBegin} />;
             case "phrase_practice":
-                return null;
+                return <PhrasePractice
+                    phrase=""
+                    onRequestRenderMorse={this.renderMorse}
+                    onStopRequest={this.handleStopRequest}
+                    onSuccess={this.handleSuccess}
+                    />;
         }
-
-        // const shownWord = (this.state.cachedLessonState && this.state.cachedLessonState.quizMode === QuizMode.VisibleSingle)
-        //     ? this.state.cachedLessonState.currentWord
-        //     : null;
-
-        // const guessHistory = this.state.cachedLessonState?.guessHistory || [];
-        // return (
-        //     <MainView
-        //         shownWord={shownWord}
-        //         statusMessage={this.getStatusMessage()}
-        //         currentGuess={this.state.cachedLessonState?.currentGuess || ""}
-        //         guessHistory={guessHistory}
-        //         onGuess={this.handleGuess}
-        //         onStopRequest={this.handleStopRequest} />
-        // );
     }
 
     private renderListeningPractice() {
@@ -237,6 +228,8 @@ export default class Main extends React.Component<{}, MainState>
                     appState: "phrase_practice"
                 });
             }
+        } else {
+            throw new Error("Unexpected call to `handleSuccess`");
         }
     }
 

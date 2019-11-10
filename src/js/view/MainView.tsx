@@ -52,7 +52,7 @@ export default class MainView extends React.Component<MainViewProperties>
                         ? <LetterView letter={this.props.shownWord} />
                         : null
                 }
-                <PhraseView />
+                {/* <PhraseView /> */}
                 <input
                     onChange={this.handleChange}
                     value={this.props.currentGuess}

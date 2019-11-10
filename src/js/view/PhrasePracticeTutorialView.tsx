@@ -1,12 +1,12 @@
 import React from "react";
 
-export interface PhrasePracticeViewProperties {
+export interface PhrasePracticeTutorialViewProperties {
     onBegin: () => void
 }
 
-export default class PhrasePracticeView extends React.Component<PhrasePracticeViewProperties>
+export default class PhrasePracticeTutorialView extends React.Component<PhrasePracticeTutorialViewProperties>
 {
-    constructor(props: PhrasePracticeViewProperties) {
+    constructor(props: PhrasePracticeTutorialViewProperties) {
         super(props);
     }
 

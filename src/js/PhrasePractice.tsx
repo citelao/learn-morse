@@ -1,8 +1,8 @@
 import React from "react";
 import MainView from "./view/MainView";
 
-export interface IntroduceLetterProperties {
-    letter: string,
+export interface PhrasePracticeProperties {
+    phrase: string,
     
     onRequestRenderMorse: (phrase: string) => void,
     onStopRequest: () => void,
@@ -10,25 +10,27 @@ export interface IntroduceLetterProperties {
     onSuccess: () => void,
 }
 
-interface IntroduceLetterState {
+interface PhrasePracticeState {
+    // currentGuess: string,
 }
 
-export default class IntroduceLetter extends React.Component<IntroduceLetterProperties, IntroduceLetterState>
+export default class PhrasePractice extends React.Component<PhrasePracticeProperties, PhrasePracticeState>
 {
-    state: IntroduceLetterState = {
+    state: PhrasePracticeState = {
+        // currentGuess: ""
     };
 
-    constructor(props: IntroduceLetterProperties) {
+    constructor(props: PhrasePracticeProperties) {
         super(props);
     }
 
     componentDidMount() {
-        this.props.onRequestRenderMorse(this.props.letter);
+        this.props.onRequestRenderMorse(this.props.phrase);
     }
 
-    componentDidUpdate(prevProps: IntroduceLetterProperties) {
-        if (prevProps.letter != this.props.letter) {
-            this.props.onRequestRenderMorse(this.props.letter);
+    componentDidUpdate(prevProps: PhrasePracticeProperties) {
+        if (prevProps.phrase != this.props.phrase) {
+            this.props.onRequestRenderMorse(this.props.phrase);
         }
     }
 
@@ -36,8 +38,8 @@ export default class IntroduceLetter extends React.Component<IntroduceLetterProp
     {
         return (
             <MainView
-                shownWord={this.props.letter}
-                statusMessage={"Type the letter you hear. Press space to repeat."}
+                shownWord={this.props.phrase}
+                statusMessage={"Type the phrase you hear. Press space to repeat."}
                 currentGuess={""}
                 guessHistory={[]}
                 onGuess={this.handleGuess}
@@ -49,10 +51,10 @@ export default class IntroduceLetter extends React.Component<IntroduceLetterProp
         console.log(complete_guess);
 
         if (complete_guess === " ") {
-            this.props.onRequestRenderMorse(this.props.letter);
+            this.props.onRequestRenderMorse(this.props.phrase);
         }
 
-        if (complete_guess === this.props.letter) {
+        if (complete_guess === this.props.phrase) {
             this.props.onSuccess();
         }
 
