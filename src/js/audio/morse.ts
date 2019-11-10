@@ -109,7 +109,7 @@ export function generateMorseNotes(context: AudioContext, message: string, optio
 } = {
     frequencyInHertz: 443,
 }): INote[] {
-    const speeds = getKochSpeeds(20, 6);
+    const speeds = getKochSpeeds(20, 12);
     const words = message.split(" ");
     const notes = words.reduce<INote[]>((currentWordNotes, word) => {
         const isFirstWord = (currentWordNotes.length === 0);
@@ -147,11 +147,27 @@ export function generateMorseNotes(context: AudioContext, message: string, optio
                             return speeds.dit_duration_seconds;
                     }
                 })(symbol);
+
+                const frequency = ((symbol: MorseSymbol): number => {
+                    // TODO: investigate this; it teaches better!
+                    const SHOULD_SEPARATE_PITCHES = false;
+                    
+                    if (SHOULD_SEPARATE_PITCHES) {
+                        switch(symbol) {
+                            case "-":
+                                return options.frequencyInHertz;
+                            case ".":
+                                return options.frequencyInHertz * 1.5;
+                        }
+                    } else {
+                        return options.frequencyInHertz;
+                    }
+                })(symbol);
                 
                 const note = generateSineNote({
                     context: context, 
                     duration: duration,
-                    frequencyInHertz: options.frequencyInHertz, 
+                    frequencyInHertz: frequency, 
                     timeFromNowInSeconds: timeOffset
                 });
                 return [
