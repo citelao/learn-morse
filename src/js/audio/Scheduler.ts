@@ -22,6 +22,7 @@ export default class Scheduler {
     }
 
     public start() {
+        // Use `setTimeout` so the window works in the background:
         // this.window.requestAnimationFrame(this.handleAnimationFrame);
         setTimeout(this.handleAnimationFrame, 0);
     }

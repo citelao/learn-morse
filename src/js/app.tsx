@@ -60,14 +60,38 @@ function generateMorseNotes(letters: string, options: {
 }): INote[] {
     const chars = letters.split("");
     const notes = chars.reduce<INote[]>((currentMorseChars, char) => {
-        const timeOffset = (currentMorseChars.length === 0)
-            ? 0
-            : currentMorseChars[currentMorseChars.length - 1].timeFromNowInSeconds + INTER_CHARACTER_DURATION;
-        const notes = [
-            ... generateSineNote({ context: context, duration: DART_DURATION, frequencyInHertz: options.frequencyInHertz, timeFromNowInSeconds: timeOffset }),
-            ... generateSineNote({ context: context, duration: DIT_DURATION, frequencyInHertz: options.frequencyInHertz, timeFromNowInSeconds: timeOffset + DART_DURATION + INTER_POINT_DURATION }),
-            ... generateSineNote({ context: context, duration: DART_DURATION, frequencyInHertz: options.frequencyInHertz, timeFromNowInSeconds: timeOffset + DART_DURATION + 2 * INTER_POINT_DURATION + DIT_DURATION }),
-        ];
+        const isFirstCharacter = (currentMorseChars.length === 0);
+
+        const points = getMorseForCharacter(char).split("");
+        const notes = points.reduce<INote[]>((currentPoints, point, pointIndex) => {
+            const isFirstPointInCharacter = (currentPoints.length === 0);
+            let timeOffset = 0;
+            if (isFirstPointInCharacter) {
+                if (isFirstCharacter) {
+                    timeOffset = 0;
+                } else {
+                    const previousCharacterPoint = currentMorseChars[currentMorseChars.length - 1];
+                    timeOffset = previousCharacterPoint.timeFromNowInSeconds + INTER_CHARACTER_DURATION;
+                }
+            } else {
+                const previousPoint = currentPoints[currentPoints.length - 1];
+                timeOffset = previousPoint.timeFromNowInSeconds + INTER_POINT_DURATION;
+            }
+            
+            const duration = (point === "-")
+                ? DART_DURATION
+                : DIT_DURATION;
+            const note = generateSineNote({
+                context: context, 
+                duration: duration,
+                frequencyInHertz: options.frequencyInHertz, 
+                timeFromNowInSeconds: timeOffset
+            });
+            return [
+                ... currentPoints,
+                ... note
+            ];
+        }, []);
 
         return [
             ... currentMorseChars,
@@ -82,6 +106,6 @@ const scheduler = new Scheduler(window, context);
 scheduler.start();
 
 setTimeout(() => {
-    const notes = generateMorseNotes('kkkk');
+    const notes = generateMorseNotes('kmmkk');
     scheduler.scheduleNotes(notes);
 }, 30);
