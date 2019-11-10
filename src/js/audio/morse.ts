@@ -120,7 +120,9 @@ export function getKochSpeeds(codingWordsPerMinute: number, effectiveWordsPerMin
     const totalWordDuration = wordDuration * effectiveWordsPerMinute;
     const totalWordPauses = 1 - totalWordDuration;
 
-    const inter_word_duration = totalWordPauses / (1 - effectiveWordsPerMinute);
+    // TODO: this is buggy.
+    // const inter_word_duration = totalWordPauses / (1 - effectiveWordsPerMinute);
+    const inter_word_duration = 2;
     const speeds: ISpeeds = {
         dit_duration_seconds: codingSpeeds.dit_duration_seconds,
         dart_duration_seconds: codingSpeeds.dart_duration_seconds,
@@ -128,6 +130,7 @@ export function getKochSpeeds(codingWordsPerMinute: number, effectiveWordsPerMin
         inter_character_duration_seconds: codingSpeeds.inter_character_duration_seconds,
         inter_word_duration_seconds: inter_word_duration
     };
+    console.log(speeds);
     return speeds;
 }
 

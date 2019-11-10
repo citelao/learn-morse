@@ -152,7 +152,16 @@ function getNextStatePartial(currentState: ILessonPlanState, action: IAction): P
                         };
                     }
                 case QuizMode.InvisiblePhrase:
-                    throw new Error("Koch mode not impl");
+                    // TODO: grade successes & failures
+                    return {
+                        currentGuess: "",
+                        guessHistory: [
+                            ...currentState.guessHistory,
+                            {
+                                guess: action.newGuess
+                            }
+                        ]
+                    };
             }
         } else {
             return {
@@ -189,7 +198,7 @@ export default class LessonPlan {
         //     guessHistory: [],
         // });
         return new LessonPlan({
-            currentLesson: 3,
+            currentLesson: 2,
             quizMode: QuizMode.InvisiblePhrase,
             currentWord: null,
             wordId: null,
