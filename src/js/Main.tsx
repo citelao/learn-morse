@@ -12,12 +12,14 @@ function createAudioContext(): AudioContext {
 interface ICachedLessonState {
     currentWord: string | null;
     wordId: number | null;
+    currentGuess: string;
     quizMode: QuizMode;
 }
 function getCachedLessonState(lessonPlan: LessonPlan) {
     const state: ICachedLessonState = {
         currentWord: lessonPlan.getCurrentWord(),
         wordId: lessonPlan.getWordId(),
+        currentGuess: lessonPlan.getCurrentGuess(),
         quizMode: lessonPlan.getQuizMode(),
     };
     return state;
@@ -100,6 +102,7 @@ export default class Main extends React.Component<{}, MainState>
                 hasStarted={this.state.hasStarted}
                 shownWord={shownWord}
                 statusMessage={this.getStatusMessage()}
+                currentGuess={this.state.cachedLessonState?.currentGuess || ""}
                 onBegin={this.handleBegin}
                 onGuess={this.handleGuess}
                 onStopRequest={this.handleStopRequest} />

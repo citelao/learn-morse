@@ -69,6 +69,10 @@ export default class LessonPlan {
         return this.state.wordId
     }
 
+    public getCurrentGuess(): string {
+        return this.state.currentGuess;
+    }
+
     public getQuizMode(): QuizMode {
         return this.state.quizMode;
     }

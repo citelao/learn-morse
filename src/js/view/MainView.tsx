@@ -5,6 +5,7 @@ export interface MainViewProperties {
     hasStarted: boolean,
 
     shownWord: string | null,
+    currentGuess: string,
     statusMessage: string | null,
 
     onBegin: () => void,
@@ -44,6 +45,7 @@ export default class MainView extends React.Component<MainViewProperties>
                 }
                 <input
                     onKeyPress={this.handleKeyPress}
+                    value={this.props.currentGuess}
                     className="morseInput"
                     autoCorrect="off"
                     autoCapitalize="off"
