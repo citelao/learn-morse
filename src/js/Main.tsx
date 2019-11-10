@@ -2,12 +2,14 @@ import React from "react";
 
 import Scheduler, { INote } from "./audio/Scheduler";
 import { generateMorseNotes } from "./audio/morse";
+import MainView from "./MainView";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
 }
 
 interface MainState {
+    hasStarted: boolean,
     currentLesson: number
 }
 
@@ -33,6 +35,7 @@ function generateWordForLesson(currentLesson: number): string {
 export default class Main extends React.Component<{}, MainState>
 {
     state = {
+        hasStarted: false,
         currentLesson: 1,
     };
 
@@ -53,18 +56,26 @@ export default class Main extends React.Component<{}, MainState>
     render()
     {
         return (
-            <section className="main">
-                <div className="letter">v</div>
-                <button onClick={this.handleBegin}>Begin!</button>
-            </section>
+            <MainView
+                hasStarted={this.state.hasStarted}
+                onBegin={this.handleBegin}
+                onGuess={this.handleGuess} />
         );
     }
 
     private handleBegin = () => {
+        this.setState({
+            hasStarted: true
+        });
+
         const word = generateWordForLesson(this.state.currentLesson);
         console.log(word);
         const notes = generateMorseNotes(this.audioContext, word);
         this.scheduler.clear();
         this.scheduler.scheduleNotes(notes);
+    }
+
+    private handleGuess = (char: string) => {
+        console.log(char);
     }
 }
