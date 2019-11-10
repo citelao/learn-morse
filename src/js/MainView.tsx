@@ -18,8 +18,8 @@ export default class MainView extends React.Component<MainViewProperties>
     render()
     {
         const input = (this.props.hasStarted)
-            ? <input onKeyPress={this.handleKeyPress} />
-            : <button onClick={this.handleBegin}>Begin!</button>;
+            ? <input onKeyPress={this.handleKeyPress} className="morseInput" />
+            : <button onClick={this.handleBegin} className="startButton">Begin!</button>;
 
         return (
             <section className="main">

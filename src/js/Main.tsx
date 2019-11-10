@@ -11,11 +11,13 @@ function createAudioContext(): AudioContext {
 
 interface ICachedLessonState {
     currentWord: string | null;
+    wordId: number | null;
     shouldShowWord: boolean;
 }
 function getCachedLessonState(lessonPlan: LessonPlan) {
     const state: ICachedLessonState = {
         currentWord: lessonPlan.getCurrentWord(),
+        wordId: lessonPlan.getWordId(),
         shouldShowWord: lessonPlan.getShouldShowCurrentWord()
     };
     return state;
@@ -58,9 +60,10 @@ export default class Main extends React.Component<{}, MainState>
         }
 
         const nowCachedLessonState = this.state.cachedLessonState && !prevState.cachedLessonState;
+        const hasWordIdChanged = (this.state.cachedLessonState && 
+            (this.state.cachedLessonState.wordId != prevState.cachedLessonState?.wordId))
         if (nowCachedLessonState ||
-            (this.state.cachedLessonState &&
-                (this.state.cachedLessonState.currentWord != prevState.cachedLessonState?.currentWord))) {
+            hasWordIdChanged) {
             if (this.state.cachedLessonState && this.state.cachedLessonState.currentWord) {
                 // New word! Play it.
                 const notes = generateMorseNotes(this.audioContext, this.state.cachedLessonState.currentWord);

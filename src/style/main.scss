@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 .main {
     max-width: 40rem;
     margin: 0 auto;
@@ -6,4 +10,21 @@
 .letter {
     font-size: 10rem;
     text-align: center;
+}
+
+.startButton {
+    display: block;
+
+    height: 25vh;
+    width: 100%;
+    background: #eee;
+
+    font-size: 3rem;
+}
+
+.morseInput {
+    width: 100%;
+    border: 2px solid;
+
+    font-size: 3rem;
 }

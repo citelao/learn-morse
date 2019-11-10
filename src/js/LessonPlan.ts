@@ -6,6 +6,7 @@ export interface ILessonPlanState {
     isSoftlyIntroducing: boolean,
 
     currentWord: string | null,
+    wordId: number | null,
     shouldShowWord: boolean,
     currentGuess: string,
 }
@@ -48,6 +49,7 @@ export default class LessonPlan {
             isIntroducing: true,
             isSoftlyIntroducing: false,
             currentWord: null,
+            wordId: null,
             shouldShowWord: false,
             currentGuess: "",
         });
@@ -62,6 +64,10 @@ export default class LessonPlan {
         return this.state.currentWord;
     }
 
+    public getWordId(): number | null {
+        return this.state.wordId
+    }
+
     public getShouldShowCurrentWord(): boolean {
         return this.state.shouldShowWord;
     }
@@ -73,6 +79,7 @@ export default class LessonPlan {
     public begin() {
         const newWord = this.getNewWord();
         this.state.currentWord = newWord.word;
+        this.state.wordId = 0;
         this.state.shouldShowWord = newWord.shouldShowWord;
         this.updateListeners();
     }
@@ -91,6 +98,7 @@ export default class LessonPlan {
                 const newWord = this.getNewWord();
                 this.state.currentWord = newWord.word;
                 this.state.shouldShowWord = newWord.shouldShowWord;
+                this.state.wordId = this.state.wordId! + 1;
                 this.state.currentGuess = "";
             } else {
                 // Oh no! a failed guess.
