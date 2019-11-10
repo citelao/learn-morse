@@ -4,6 +4,7 @@ import Scheduler, { INote } from "./audio/Scheduler";
 import { generateMorseNotes, INTER_WORD_DURATION, getKochSpeeds } from "./audio/morse";
 import MainView from "./view/MainView";
 import LessonPlan, { QuizMode, IGuess } from "./LessonPlan";
+import ListeningTutorialView from "./view/ListeningTutorialView";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -29,8 +30,16 @@ function getCachedLessonState(lessonPlan: LessonPlan) {
     return state;
 }
 
+type AppState = 
+    "unstarted" |
+    "tutorial_listening" |
+    "introduce_listening" |
+    "introduce_letter" |
+    "tutorial_phrase_practice" |
+    "phrase_practice";
+
 interface MainState {
-    hasStarted: boolean,
+    appState: AppState,
 
     currentLesson: LessonPlan,
     cachedLessonState: ICachedLessonState | null
@@ -39,7 +48,7 @@ interface MainState {
 export default class Main extends React.Component<{}, MainState>
 {
     state: MainState = {
-        hasStarted: false,
+        appState: "unstarted",
         currentLesson: LessonPlan.create(),
         cachedLessonState: null
     };
@@ -61,8 +70,10 @@ export default class Main extends React.Component<{}, MainState>
     }
 
     componentDidUpdate(prevProps: {}, prevState: MainState) {
-        if (this.state.hasStarted != prevState.hasStarted) {
-            this.state.currentLesson.begin();
+        if (this.state.appState != prevState.appState) {
+            if (this.state.appState === "introduce_listening") {
+                this.state.currentLesson.begin();
+            }
         }
 
         const nowCachedLessonState = this.state.cachedLessonState && !prevState.cachedLessonState;
@@ -115,6 +126,13 @@ export default class Main extends React.Component<{}, MainState>
 
     render()
     {
+        switch (this.state.appState) {
+            case "tutorial_listening":
+                return <ListeningTutorialView onBegin={this.handleBegin} />;
+            default:
+                // Nothing.
+        }
+
         const shownWord = (this.state.cachedLessonState && this.state.cachedLessonState.quizMode === QuizMode.VisibleSingle)
             ? this.state.cachedLessonState.currentWord
             : null;
@@ -122,7 +140,7 @@ export default class Main extends React.Component<{}, MainState>
         const guessHistory = this.state.cachedLessonState?.guessHistory || [];
         return (
             <MainView
-                hasStarted={this.state.hasStarted}
+                hasStarted={this.state.appState !== "unstarted"}
                 shownWord={shownWord}
                 statusMessage={this.getStatusMessage()}
                 currentGuess={this.state.cachedLessonState?.currentGuess || ""}
@@ -134,10 +152,16 @@ export default class Main extends React.Component<{}, MainState>
     }
 
     private handleBegin = () => {
-        this.audioContext.resume();
-        this.setState({
-            hasStarted: true
-        });
+        if (this.state.appState === "unstarted") {
+            this.setState({
+                appState: "tutorial_listening",
+            });
+        } else if (this.state.appState === "tutorial_listening") {
+            this.audioContext.resume();
+            this.setState({
+                appState: "introduce_listening",
+            });
+        }
     }
 
     private handleGuess = (char: string) => {

@@ -1,6 +1,8 @@
 import React from "react";
 import BeginView from "./BeginView";
 import { IGuess } from "../LessonPlan";
+import LetterView from "./quiz_view/LetterView";
+import PhraseView from "./quiz_view/PhraseView";
 
 export interface MainViewProperties {
     hasStarted: boolean,
@@ -57,9 +59,10 @@ export default class MainView extends React.Component<MainViewProperties>
                 {guessHistory}
                 {
                     (this.props.shownWord) 
-                        ? <div className="letter">{this.props.shownWord}</div>
+                        ? <LetterView letter={this.props.shownWord} />
                         : null
                 }
+                <PhraseView />
                 <input
                     onChange={this.handleChange}
                     value={this.props.currentGuess}
