@@ -5,6 +5,7 @@ import { generateMorseNotes, INTER_WORD_DURATION, getKochSpeeds } from "./audio/
 import MainView from "./view/MainView";
 import LessonPlan, { QuizMode, IGuess } from "./LessonPlan";
 import ListeningTutorialView from "./view/ListeningTutorialView";
+import BeginView from "./view/BeginView";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -127,6 +128,8 @@ export default class Main extends React.Component<{}, MainState>
     render()
     {
         switch (this.state.appState) {
+            case "unstarted":
+                return <BeginView onBegin={this.handleBegin} />;
             case "tutorial_listening":
                 return <ListeningTutorialView onBegin={this.handleBegin} />;
             case "introduce_listening":

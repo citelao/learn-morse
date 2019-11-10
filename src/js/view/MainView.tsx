@@ -5,14 +5,11 @@ import LetterView from "./quiz_view/LetterView";
 import PhraseView from "./quiz_view/PhraseView";
 
 export interface MainViewProperties {
-    hasStarted: boolean,
-
     shownWord: string | null,
     currentGuess: string,
     guessHistory: IGuess[],
     statusMessage: string | null,
 
-    onBegin: () => void,
     onGuess: (char: string) => boolean,
     onStopRequest: () => void,
 }
@@ -27,19 +24,12 @@ export default class MainView extends React.Component<MainViewProperties>
         this.inputRef = React.createRef<HTMLInputElement>();
     }
 
-    componentDidUpdate(prevProps: MainViewProperties) {
-        if(this.props.hasStarted != prevProps.hasStarted) {
-            this.inputRef.current?.focus();
-        }
+    componentDidMount() {
+        this.inputRef.current?.focus();
     }
 
     render()
     {
-        if (!this.props.hasStarted) {
-            return <BeginView
-                onBegin={this.props.onBegin} />;
-        }
-
         const historyOffset = (this.props.guessHistory.length > 5)
             ? this.props.guessHistory.length - 5
             : 0;
