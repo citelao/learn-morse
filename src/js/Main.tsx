@@ -3,42 +3,37 @@ import React from "react";
 import Scheduler, { INote } from "./audio/Scheduler";
 import { generateMorseNotes } from "./audio/morse";
 import MainView from "./MainView";
+import LessonPlan from "./LessonPlan";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
 }
 
-interface MainState {
-    hasStarted: boolean,
-    currentLesson: number,
-    currentWord: string | null
+interface ICachedLessonState {
+    currentWord: string | null;
+    shouldShowWord: boolean;
+}
+function getCachedLessonState(lessonPlan: LessonPlan) {
+    const state: ICachedLessonState = {
+        currentWord: lessonPlan.getCurrentWord(),
+        shouldShowWord: lessonPlan.getShouldShowCurrentWord()
+    };
+    return state;
 }
 
-const LETTER_SERIES = [
-    "k",
-    "m",
-    "u"
-];
+interface MainState {
+    hasStarted: boolean,
 
-function generateWordForLesson(currentLesson: number): string {
-    const availableLetters = LETTER_SERIES.slice(0, currentLesson);
-
-    const LENGTH = 5;
-    let word = "";
-    for(let i = 0; i < LENGTH; i++) {
-        const randomIndex = Math.floor(Math.random() * (availableLetters.length - 1));
-        word += availableLetters[randomIndex];
-    }
-
-    return word;
+    currentLesson: LessonPlan,
+    cachedLessonState: ICachedLessonState | null
 }
 
 export default class Main extends React.Component<{}, MainState>
 {
     state: MainState = {
         hasStarted: false,
-        currentLesson: 1,
-        currentWord: null
+        currentLesson: LessonPlan.create(),
+        cachedLessonState: null
     };
 
     private audioContext: AudioContext;
@@ -50,6 +45,8 @@ export default class Main extends React.Component<{}, MainState>
         this.audioContext = createAudioContext();
         this.scheduler = new Scheduler(window, this.audioContext);
         this.scheduler.start();
+
+        this.state.currentLesson.registerListener(this.handleLessonStateChange);
     }
 
     componentDidMount() {
@@ -57,13 +54,16 @@ export default class Main extends React.Component<{}, MainState>
 
     componentDidUpdate(prevProps: {}, prevState: MainState) {
         if (this.state.hasStarted != prevState.hasStarted) {
-            // We just started!
+            this.state.currentLesson.begin();
         }
 
-        if (this.state.currentWord != prevState.currentWord) {
-            if (this.state.currentWord) {
+        const nowCachedLessonState = this.state.cachedLessonState && !prevState.cachedLessonState;
+        if (nowCachedLessonState ||
+            (this.state.cachedLessonState &&
+                (this.state.cachedLessonState.currentWord != prevState.cachedLessonState?.currentWord))) {
+            if (this.state.cachedLessonState && this.state.cachedLessonState.currentWord) {
                 // New word! Play it.
-                const notes = generateMorseNotes(this.audioContext, this.state.currentWord);
+                const notes = generateMorseNotes(this.audioContext, this.state.cachedLessonState.currentWord);
                 this.scheduler.clear();
                 this.scheduler.scheduleNotes(notes);
             }
@@ -72,25 +72,31 @@ export default class Main extends React.Component<{}, MainState>
 
     render()
     {
+        const shownWord = (this.state.cachedLessonState && this.state.cachedLessonState.shouldShowWord)
+            ? this.state.cachedLessonState.currentWord
+            : null;
         return (
             <MainView
                 hasStarted={this.state.hasStarted}
+                shownWord={shownWord}
                 onBegin={this.handleBegin}
                 onGuess={this.handleGuess} />
         );
     }
 
     private handleBegin = () => {
-        const word = generateWordForLesson(this.state.currentLesson);
-        console.log(word);
-
         this.setState({
-            hasStarted: true,
-            currentWord: word
+            hasStarted: true
         });
     }
 
     private handleGuess = (char: string) => {
         console.log(char);
+    }
+
+    private handleLessonStateChange = () => {
+        this.setState({
+            cachedLessonState: getCachedLessonState(this.state.currentLesson)
+        });
     }
 }

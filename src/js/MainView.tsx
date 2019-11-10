@@ -3,6 +3,8 @@ import React from "react";
 export interface MainViewProperties {
     hasStarted: boolean,
 
+    shownWord: string | null,
+
     onBegin: () => void,
     onGuess: (char: string) => void
 }
@@ -21,7 +23,11 @@ export default class MainView extends React.Component<MainViewProperties>
 
         return (
             <section className="main">
-                <div className="letter">v</div>
+                {
+                    (this.props.shownWord) 
+                        ? <div className="letter">{this.props.shownWord}</div>
+                        : null
+                }
                 {input}
             </section>
         );
