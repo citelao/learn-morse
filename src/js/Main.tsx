@@ -10,7 +10,8 @@ function createAudioContext(): AudioContext {
 
 interface MainState {
     hasStarted: boolean,
-    currentLesson: number
+    currentLesson: number,
+    currentWord: string | null
 }
 
 const LETTER_SERIES = [
@@ -29,14 +30,15 @@ function generateWordForLesson(currentLesson: number): string {
         word += availableLetters[randomIndex];
     }
 
-    return word
+    return word;
 }
 
 export default class Main extends React.Component<{}, MainState>
 {
-    state = {
+    state: MainState = {
         hasStarted: false,
         currentLesson: 1,
+        currentWord: null
     };
 
     private audioContext: AudioContext;
@@ -53,6 +55,21 @@ export default class Main extends React.Component<{}, MainState>
     componentDidMount() {
     }
 
+    componentDidUpdate(prevProps: {}, prevState: MainState) {
+        if (this.state.hasStarted != prevState.hasStarted) {
+            // We just started!
+        }
+
+        if (this.state.currentWord != prevState.currentWord) {
+            if (this.state.currentWord) {
+                // New word! Play it.
+                const notes = generateMorseNotes(this.audioContext, this.state.currentWord);
+                this.scheduler.clear();
+                this.scheduler.scheduleNotes(notes);
+            }
+        }
+    }
+
     render()
     {
         return (
@@ -64,15 +81,13 @@ export default class Main extends React.Component<{}, MainState>
     }
 
     private handleBegin = () => {
-        this.setState({
-            hasStarted: true
-        });
-
         const word = generateWordForLesson(this.state.currentLesson);
         console.log(word);
-        const notes = generateMorseNotes(this.audioContext, word);
-        this.scheduler.clear();
-        this.scheduler.scheduleNotes(notes);
+
+        this.setState({
+            hasStarted: true,
+            currentWord: word
+        });
     }
 
     private handleGuess = (char: string) => {
