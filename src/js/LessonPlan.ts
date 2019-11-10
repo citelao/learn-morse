@@ -11,6 +11,7 @@ export interface ILessonPlanState {
     quizMode: QuizMode,
 
     currentWord: string | null,
+    currentPhrase: string[] | null,
     wordId: number | null,
     currentGuess: string,
 }
@@ -48,10 +49,11 @@ export default class LessonPlan {
     public static create() {
         // Create a basic LessonPlan
         return new LessonPlan({
-            currentLesson: 3,
+            currentLesson: 1,
             quizMode: QuizMode.VisibleSingle,
             currentWord: null,
             wordId: null,
+            currentPhrase: null,
             currentGuess: "",
         });
     }
@@ -88,8 +90,8 @@ export default class LessonPlan {
         this.updateListeners();
     }
 
-    public handleGuess(char: string) {
-        this.state.currentGuess += char;
+    public handleGuess(guess: string) {
+        this.state.currentGuess = guess;
         if(this.state.currentGuess.length === this.state.currentWord?.length) {
             if (this.state.currentGuess == this.state.currentWord) {
                 // On success.

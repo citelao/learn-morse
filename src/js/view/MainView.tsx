@@ -44,7 +44,7 @@ export default class MainView extends React.Component<MainViewProperties>
                         : null
                 }
                 <input
-                    onKeyPress={this.handleKeyPress}
+                    onChange={this.handleChange}
                     value={this.props.currentGuess}
                     className="morseInput"
                     autoCorrect="off"
@@ -60,8 +60,8 @@ export default class MainView extends React.Component<MainViewProperties>
         );
     }
 
-    private handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        const shouldCancel = this.props.onGuess(e.key);
+    private handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const shouldCancel = this.props.onGuess(e.target.value);
         if (shouldCancel) {
             e.preventDefault();
         }
