@@ -1,7 +1,8 @@
 export enum QuizMode {
     VisibleSingle = 1,
     InvisibleSingle = 2,
-    InvisibleWords = 3,
+    InvisibleWord = 3,
+    InvisiblePhrase = 4,
 }
 
 export interface IGuess {
@@ -97,7 +98,8 @@ export default class LessonPlan {
     public begin() {
         const newWord = this.getNewWord();
         this.state.currentWord = newWord.word;
-        this.state.wordId = 0;
+        this.state.wordId = (this.state.wordId || -1) + 1;
+        this.state.currentGuess = "";
         this.updateListeners();
     }
 
@@ -108,30 +110,31 @@ export default class LessonPlan {
                 guess: this.state.currentGuess
             });
 
-            if (this.state.currentGuess == this.state.currentWord) {
-                // On success.
-
-                // Update the state:
-                if (this.state.quizMode === QuizMode.VisibleSingle) {
-                    // Special-case the first letter, since we already just learned it.
-                    if (this.state.currentLesson === 1) {
-                        this.state.currentLesson += 1;
-                        this.state.quizMode = QuizMode.VisibleSingle;
-                    } else {
-                        this.state.quizMode = QuizMode.InvisibleSingle;
-                    }
-                } else if(this.state.quizMode === QuizMode.InvisibleSingle) {
-                    this.state.quizMode = QuizMode.InvisibleWords;
-                }
-
-                // Generate a new word:
-                const newWord = this.getNewWord();
-                this.state.currentWord = newWord.word;
-                this.state.wordId = this.state.wordId! + 1;
-                this.state.currentGuess = "";
+            if (this.state.quizMode === QuizMode.InvisiblePhrase) {
+                // TODO. Phrase mode (Koch mode) is weird.
             } else {
-                // Oh no! a failed guess.
-                this.state.currentGuess = "";
+                if (this.state.currentGuess == this.state.currentWord) {
+                    // On success.
+    
+                    // Update the state:
+                    if (this.state.quizMode === QuizMode.VisibleSingle) {
+                        // Special-case the first letter, since we already just learned it.
+                        if (this.state.currentLesson === 1) {
+                            this.state.currentLesson += 1;
+                            this.state.quizMode = QuizMode.VisibleSingle;
+                        } else {
+                            this.state.quizMode = QuizMode.InvisibleSingle;
+                        }
+                    } else if(this.state.quizMode === QuizMode.InvisibleSingle) {
+                        this.state.quizMode = QuizMode.InvisibleWord;
+                    }
+    
+                    // Generate a new word:
+                    this.begin();
+                } else {
+                    // Oh no! a failed guess.
+                    this.state.currentGuess = "";
+                }
             }
         } else {
             // TODO: queue word grading
