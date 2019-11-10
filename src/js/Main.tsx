@@ -129,6 +129,8 @@ export default class Main extends React.Component<{}, MainState>
         switch (this.state.appState) {
             case "tutorial_listening":
                 return <ListeningTutorialView onBegin={this.handleBegin} />;
+            case "introduce_listening":
+                return this.renderListeningPractice();
             default:
                 // Nothing.
         }
@@ -145,6 +147,20 @@ export default class Main extends React.Component<{}, MainState>
                 statusMessage={this.getStatusMessage()}
                 currentGuess={this.state.cachedLessonState?.currentGuess || ""}
                 guessHistory={guessHistory}
+                onBegin={this.handleBegin}
+                onGuess={this.handleGuess}
+                onStopRequest={this.handleStopRequest} />
+        );
+    }
+
+    private renderListeningPractice() {
+        return (
+            <MainView
+                hasStarted={true}
+                shownWord={"k"}
+                statusMessage={"TODO"}
+                currentGuess={""}
+                guessHistory={[]}
                 onBegin={this.handleBegin}
                 onGuess={this.handleGuess}
                 onStopRequest={this.handleStopRequest} />
