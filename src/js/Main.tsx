@@ -2,7 +2,7 @@ import React from "react";
 
 import Scheduler, { INote } from "./audio/Scheduler";
 import { generateMorseNotes } from "./audio/morse";
-import MainView from "./MainView";
+import MainView from "./view/MainView";
 import LessonPlan from "./LessonPlan";
 
 function createAudioContext(): AudioContext {
@@ -88,6 +88,7 @@ export default class Main extends React.Component<{}, MainState>
     }
 
     private handleBegin = () => {
+        this.audioContext.resume();
         this.setState({
             hasStarted: true
         });

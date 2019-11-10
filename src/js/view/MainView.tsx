@@ -1,4 +1,5 @@
 import React from "react";
+import BeginView from "./BeginView";
 
 export interface MainViewProperties {
     hasStarted: boolean,
@@ -17,6 +18,11 @@ export default class MainView extends React.Component<MainViewProperties>
 
     render()
     {
+        if (!this.props.hasStarted) {
+            return <BeginView
+                onBegin={this.props.onBegin} />;
+        }
+
         const input = (this.props.hasStarted)
             ? <input onKeyPress={this.handleKeyPress} className="morseInput" />
             : <button onClick={this.handleBegin} className="startButton">Begin!</button>;
