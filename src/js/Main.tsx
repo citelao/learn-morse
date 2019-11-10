@@ -155,24 +155,24 @@ export default class Main extends React.Component<{}, MainState>
                     onSuccess={this.handleSuccess} />;
             case "tutorial_phrase_practice":
                 return <PhrasePracticeView onBegin={this.handleBegin} />;
-            default:
-                // Nothing.
+            case "phrase_practice":
+                return null;
         }
 
-        const shownWord = (this.state.cachedLessonState && this.state.cachedLessonState.quizMode === QuizMode.VisibleSingle)
-            ? this.state.cachedLessonState.currentWord
-            : null;
+        // const shownWord = (this.state.cachedLessonState && this.state.cachedLessonState.quizMode === QuizMode.VisibleSingle)
+        //     ? this.state.cachedLessonState.currentWord
+        //     : null;
 
-        const guessHistory = this.state.cachedLessonState?.guessHistory || [];
-        return (
-            <MainView
-                shownWord={shownWord}
-                statusMessage={this.getStatusMessage()}
-                currentGuess={this.state.cachedLessonState?.currentGuess || ""}
-                guessHistory={guessHistory}
-                onGuess={this.handleGuess}
-                onStopRequest={this.handleStopRequest} />
-        );
+        // const guessHistory = this.state.cachedLessonState?.guessHistory || [];
+        // return (
+        //     <MainView
+        //         shownWord={shownWord}
+        //         statusMessage={this.getStatusMessage()}
+        //         currentGuess={this.state.cachedLessonState?.currentGuess || ""}
+        //         guessHistory={guessHistory}
+        //         onGuess={this.handleGuess}
+        //         onStopRequest={this.handleStopRequest} />
+        // );
     }
 
     private renderListeningPractice() {
@@ -210,6 +210,12 @@ export default class Main extends React.Component<{}, MainState>
             this.setState({
                 appState: "introduce_listening",
             });
+        } else if (this.state.appState === "tutorial_phrase_practice") {
+            this.setState({
+                appState: "phrase_practice",
+            });
+        } else {
+            throw new Error("Unexpected call of `handleBegin`")
         }
     }
 
@@ -247,10 +253,8 @@ export default class Main extends React.Component<{}, MainState>
         if (char === ' ') {
             // Restart.
             if (this.state.cachedLessonState && this.state.cachedLessonState.currentWord) {
-                const notes = generateMorseNotes(this.audioContext, this.state.cachedLessonState.currentWord);
-                this.scheduler.clear();
-                this.scheduler.scheduleNotes(notes);
-                
+                this.renderMorse(this.state.cachedLessonState.currentWord);
+
                 return true;
             }
         } else {
