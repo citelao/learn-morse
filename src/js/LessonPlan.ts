@@ -1,7 +1,9 @@
 /** LessonPlan is designed to be trivially serializable to JSON. */
 export interface ILessonPlanState {
     currentLesson: number,
+
     isIntroducing: boolean,
+    isSoftlyIntroducing: boolean,
 
     currentWord: string | null,
     shouldShowWord: boolean,
@@ -42,8 +44,9 @@ export default class LessonPlan {
     public static create() {
         // Create a basic LessonPlan
         return new LessonPlan({
-            currentLesson: 1,
+            currentLesson: 2,
             isIntroducing: true,
+            isSoftlyIntroducing: false,
             currentWord: null,
             shouldShowWord: false,
             currentGuess: "",
@@ -75,7 +78,29 @@ export default class LessonPlan {
     }
 
     public handleGuess(char: string) {
-        
+        this.state.currentGuess += char;
+        if(this.state.currentGuess.length === this.state.currentWord?.length) {
+            if (this.state.currentGuess == this.state.currentWord) {
+                // On success:
+                if (this.state.isIntroducing && !this.state.isSoftlyIntroducing) {
+                    this.state.isSoftlyIntroducing = true;
+                } else if(this.state.isIntroducing) {
+                    this.state.isIntroducing = false;
+                }
+
+                const newWord = this.getNewWord();
+                this.state.currentWord = newWord.word;
+                this.state.shouldShowWord = newWord.shouldShowWord;
+                this.state.currentGuess = "";
+            } else {
+                // Oh no! a failed guess.
+                this.state.currentGuess = "";
+            }
+        } else {
+            // TODO: queue word grading
+        }
+
+        this.updateListeners();
     }
 
     private getNewWord(): INewWord {
@@ -85,7 +110,7 @@ export default class LessonPlan {
         
         const newWord: INewWord = {
             word: word,
-            shouldShowWord: true
+            shouldShowWord: (this.state.isIntroducing && !this.state.isSoftlyIntroducing)
         };
         return newWord;
     }

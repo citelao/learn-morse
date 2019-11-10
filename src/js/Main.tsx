@@ -92,6 +92,7 @@ export default class Main extends React.Component<{}, MainState>
 
     private handleGuess = (char: string) => {
         console.log(char);
+        this.state.currentLesson.handleGuess(char);
     }
 
     private handleLessonStateChange = () => {
