@@ -13,8 +13,18 @@ export interface MainViewProperties {
 
 export default class MainView extends React.Component<MainViewProperties>
 {
+    private inputRef: React.RefObject<HTMLInputElement>;
+
     constructor(props: MainViewProperties) {
         super(props);
+
+        this.inputRef = React.createRef<HTMLInputElement>();
+    }
+
+    componentDidUpdate(prevProps: MainViewProperties) {
+        if(this.props.hasStarted != prevProps.hasStarted) {
+            this.inputRef.current?.focus();
+        }
     }
 
     render()
@@ -31,12 +41,13 @@ export default class MainView extends React.Component<MainViewProperties>
                         ? <div className="letter">{this.props.shownWord}</div>
                         : null
                 }
-                <button className="startButton" onClick={this.handleStopRequest}>(stop)</button>
                 <input
                     onKeyPress={this.handleKeyPress}
                     className="morseInput"
                     autoCorrect="off"
-                    autoCapitalize="off" />
+                    autoCapitalize="off"
+                    ref={this.inputRef} />
+                <button className="startButton" onClick={this.handleStopRequest}>(stop)</button>
             </section>
         );
     }
@@ -50,5 +61,6 @@ export default class MainView extends React.Component<MainViewProperties>
 
     private handleStopRequest = () => {
         this.props.onStopRequest();
+        this.inputRef.current?.focus();
     }
 }

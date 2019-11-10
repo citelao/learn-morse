@@ -45,7 +45,7 @@ export default class LessonPlan {
     public static create() {
         // Create a basic LessonPlan
         return new LessonPlan({
-            currentLesson: 2,
+            currentLesson: 3,
             isIntroducing: true,
             isSoftlyIntroducing: false,
             currentWord: null,

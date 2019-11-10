@@ -4,7 +4,8 @@ import { generateSineNote } from "./sine";
 function getMorseForCharacter(char: string) {
     const MORSE_ALPHABET: { [key: string]: string } = {
         "k": "-.-",
-        "m": "--"
+        "m": "--",
+        "u": "..-"
     };
 
     if (char.length > 1) {
