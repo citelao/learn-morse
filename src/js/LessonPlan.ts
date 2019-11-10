@@ -45,20 +45,12 @@ function generateWordForLesson(currentLesson: number): string {
 function getNewWord(args: {
     quizMode: QuizMode,
     currentLesson: number
-}): INewWord {
+}) {
     const word = (args.quizMode === QuizMode.VisibleSingle || args.quizMode === QuizMode.InvisibleSingle)
         ? LETTER_SERIES[args.currentLesson - 1]
         : generateWordForLesson(args.currentLesson);
-    
-    const newWord: INewWord = {
-        word: word,
-    };
-    return newWord;
-}
 
-/** Internal interface for generating words */
-interface INewWord {
-    word: string;
+    return word;
 }
 
 interface IAction {
@@ -68,16 +60,38 @@ interface IAction {
 
 function getNextStatePartial(currentState: ILessonPlanState, action: IAction): Partial<ILessonPlanState> {    
     if (action.begin) {
-        const newWord = getNewWord({
-            currentLesson: currentState.currentLesson,
-            quizMode: currentState.quizMode
-        });
+        switch(currentState.quizMode) {
+            case QuizMode.VisibleSingle:
+            case QuizMode.InvisibleSingle:
+            case QuizMode.InvisibleWord:
+                const newWord = getNewWord({
+                    currentLesson: currentState.currentLesson,
+                    quizMode: currentState.quizMode
+                });
 
-        return {
-            currentWord: newWord.word,
-            wordId: (currentState.wordId || 0) + 1,
-            currentGuess: "",
-        };
+                return {
+                    currentWord: newWord,
+                    wordId: (currentState.wordId || 0) + 1,
+                    currentGuess: "",
+                };
+            case QuizMode.InvisiblePhrase:
+                // TODO: do this on user advance, too.
+                const phrase: string[] = [];
+                const PHRASE_LENGTH = 6;
+                for (let index = 0; index < PHRASE_LENGTH; index++) {
+                    phrase.push(getNewWord({
+                        currentLesson: currentState.currentLesson,
+                        quizMode: currentState.quizMode
+                    }));
+                }
+
+                return {
+                    currentWord: phrase[0],
+                    wordId: (currentState.wordId || 0) + 1,
+                    currentPhrase: phrase,
+                    currentGuess: "",
+                };
+        }
     } else if (action.newGuess) {
         const isFullGuess = action.newGuess.length === currentState.currentWord?.length;
         if (isFullGuess) {
@@ -115,7 +129,7 @@ function getNextStatePartial(currentState: ILessonPlanState, action: IAction): P
                         });
 
                         return Object.assign(partial, {
-                            currentWord: newWord.word,
+                            currentWord: newWord,
                             wordId: (currentState.wordId || 0) + 1,
                             currentGuess: "",
                             guessHistory: [
@@ -165,9 +179,18 @@ export default class LessonPlan {
 
     public static create() {
         // Create a basic LessonPlan
+        // return new LessonPlan({
+        //     currentLesson: 1,
+        //     quizMode: QuizMode.VisibleSingle,
+        //     currentWord: null,
+        //     wordId: null,
+        //     currentPhrase: null,
+        //     currentGuess: "",
+        //     guessHistory: [],
+        // });
         return new LessonPlan({
-            currentLesson: 1,
-            quizMode: QuizMode.VisibleSingle,
+            currentLesson: 3,
+            quizMode: QuizMode.InvisiblePhrase,
             currentWord: null,
             wordId: null,
             currentPhrase: null,
@@ -187,6 +210,10 @@ export default class LessonPlan {
 
     public getWordId(): number | null {
         return this.state.wordId
+    }
+
+    public getCurrentPhrase(): string[] | null {
+        return this.state.currentPhrase;
     }
 
     public getCurrentGuess(): string {

@@ -22,7 +22,8 @@ function getMorseForCharacter(char: string): MorseSymbol[] {
     const MORSE_ALPHABET: { [key: string]: string } = {
         "k": "-.-",
         "m": "--",
-        "u": "..-"
+        "u": "..-",
+        " ": " ",
     };
 
     if (char.length > 1) {
@@ -135,52 +136,68 @@ export function generateMorseNotes(context: AudioContext, message: string, optio
 } = {
     frequencyInHertz: 443,
 }): INote[] {
-    const speeds = getSpeeds(20);
-    const chars = message.split("");
-    const notes = chars.reduce<INote[]>((currentMorseChars, char) => {
-        const isFirstCharacter = (currentMorseChars.length === 0);
+    const speeds = getKochSpeeds(20, 6);
+    const words = message.split(" ");
+    const notes = words.reduce<INote[]>((currentWordNotes, word) => {
+        const isFirstWord = (currentWordNotes.length === 0);
 
-        const points = getMorseForCharacter(char);
-        const notes = points.reduce<INote[]>((currentPoints, point, pointIndex) => {
-            const isFirstPointInCharacter = (currentPoints.length === 0);
-            let timeOffset = 0;
-            if (isFirstPointInCharacter) {
-                if (isFirstCharacter) {
-                    timeOffset = 0;
+        const chars = word.split("");
+        const notes = chars.reduce<INote[]>((currentMorseChars, char) => {
+            const isFirstCharacter = (currentMorseChars.length === 0);
+
+            const symbols = getMorseForCharacter(char);
+            const notes = symbols.reduce<INote[]>((currentPoints, symbol, symbolIndex) => {
+                const isFirstPointInCharacter = (currentPoints.length === 0);
+                let timeOffset = 0;
+                if (isFirstPointInCharacter) {
+                    if (isFirstCharacter) {
+                        if (isFirstWord) {
+                            timeOffset = 0;
+                        } else {
+                            const previousWordPoint = currentWordNotes[currentWordNotes.length - 1];
+                            timeOffset = previousWordPoint.timeFromNowInSeconds + speeds.inter_word_duration_seconds;
+                        }
+                    } else {
+                        const previousCharacterPoint = currentMorseChars[currentMorseChars.length - 1];
+                        timeOffset = previousCharacterPoint.timeFromNowInSeconds + speeds.inter_character_duration_seconds;
+                    }
                 } else {
-                    const previousCharacterPoint = currentMorseChars[currentMorseChars.length - 1];
-                    timeOffset = previousCharacterPoint.timeFromNowInSeconds + speeds.inter_character_duration_seconds;
+                    const previousPoint = currentPoints[currentPoints.length - 1];
+                    timeOffset = previousPoint.timeFromNowInSeconds + speeds.inter_symbol_duration_seconds;
                 }
-            } else {
-                const previousPoint = currentPoints[currentPoints.length - 1];
-                timeOffset = previousPoint.timeFromNowInSeconds + speeds.inter_symbol_duration_seconds;
-            }
-            
-            const duration = ((point: MorseSymbol): number => {
-                switch(point) {
-                    case "-":
-                        return speeds.dart_duration_seconds;
-                    case ".":
-                        return speeds.dit_duration_seconds;
-                }
-            })(point);
-            
-            const note = generateSineNote({
-                context: context, 
-                duration: duration,
-                frequencyInHertz: options.frequencyInHertz, 
-                timeFromNowInSeconds: timeOffset
-            });
+                
+                const duration = ((symbol: MorseSymbol): number => {
+                    switch(symbol) {
+                        case "-":
+                            return speeds.dart_duration_seconds;
+                        case ".":
+                            return speeds.dit_duration_seconds;
+                    }
+                })(symbol);
+                
+                const note = generateSineNote({
+                    context: context, 
+                    duration: duration,
+                    frequencyInHertz: options.frequencyInHertz, 
+                    timeFromNowInSeconds: timeOffset
+                });
+                return [
+                    ... currentPoints,
+                    ... note
+                ];
+            }, []);
+
             return [
-                ... currentPoints,
-                ... note
+                ... currentMorseChars,
+                ... notes
             ];
         }, []);
 
         return [
-            ... currentMorseChars,
+            ... currentWordNotes,
             ... notes
         ];
     }, []);
+    
     return notes;
 }

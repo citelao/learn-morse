@@ -12,6 +12,7 @@ function createAudioContext(): AudioContext {
 interface ICachedLessonState {
     currentWord: string | null;
     wordId: number | null;
+    currentPhrase: string[] | null;
     currentGuess: string;
     guessHistory: IGuess[];
     quizMode: QuizMode;
@@ -20,6 +21,7 @@ function getCachedLessonState(lessonPlan: LessonPlan) {
     const state: ICachedLessonState = {
         currentWord: lessonPlan.getCurrentWord(),
         wordId: lessonPlan.getWordId(),
+        currentPhrase: lessonPlan.getCurrentPhrase(),
         currentGuess: lessonPlan.getCurrentGuess(),
         guessHistory: lessonPlan.getGuessHistory(),
         quizMode: lessonPlan.getQuizMode(),
@@ -66,8 +68,9 @@ export default class Main extends React.Component<{}, MainState>
         const nowCachedLessonState = this.state.cachedLessonState && !prevState.cachedLessonState;
         const hasWordIdChanged = (this.state.cachedLessonState && 
             (this.state.cachedLessonState.wordId != prevState.cachedLessonState?.wordId))
-        if (nowCachedLessonState ||
-            hasWordIdChanged) {
+        const shouldReadNewWords = (this.state.cachedLessonState?.quizMode !== QuizMode.InvisiblePhrase);
+        if (shouldReadNewWords && 
+            (nowCachedLessonState || hasWordIdChanged)) {
             setTimeout(() => {
                 if (this.state.cachedLessonState && this.state.cachedLessonState.currentWord) {
                     // New word! Play it. Set a delay to not jolt people.
@@ -76,6 +79,20 @@ export default class Main extends React.Component<{}, MainState>
                     this.scheduler.scheduleNotes(notes);
                 }
             }, getKochSpeeds(20, 6).inter_word_duration_seconds * 1000);
+        }
+
+        const shouldReadNewPhrases = (this.state.cachedLessonState?.quizMode === QuizMode.InvisiblePhrase);
+        const hasPhraseChanged = (this.state.cachedLessonState &&
+            (this.state.cachedLessonState.currentPhrase !== prevState.cachedLessonState?.currentPhrase))
+        if (shouldReadNewPhrases &&
+            (hasPhraseChanged || nowCachedLessonState)) {
+            if (this.state.cachedLessonState && this.state.cachedLessonState.currentPhrase) {
+                // New phrase! Play it. Set a delay to not jolt people.
+                const phrase = this.state.cachedLessonState?.currentPhrase.join(" ");
+                const notes = generateMorseNotes(this.audioContext, phrase);
+                this.scheduler.clear();
+                this.scheduler.scheduleNotes(notes);
+            }
         }
     }
 
