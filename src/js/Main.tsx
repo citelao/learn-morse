@@ -97,7 +97,20 @@ export default class Main extends React.Component<{}, MainState>
 
     private handleGuess = (char: string) => {
         console.log(char);
-        this.state.currentLesson.handleGuess(char);
+
+        if (char === ' ') {
+            // Restart.
+            if (this.state.cachedLessonState && this.state.cachedLessonState.currentWord) {
+                const notes = generateMorseNotes(this.audioContext, this.state.cachedLessonState.currentWord);
+                this.scheduler.clear();
+                this.scheduler.scheduleNotes(notes);
+                
+                return true;
+            }
+        } else {
+            this.state.currentLesson.handleGuess(char);
+            return false;
+        }
     }
 
     private handleStopRequest = () => {
