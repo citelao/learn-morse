@@ -86,7 +86,8 @@ export function getSpeeds(wordsPerMinute: number): ISpeeds {
 export function getKochSpeeds(codingWordsPerMinute: number, effectiveWordsPerMinute: number): ISpeeds {
     const codingSpeeds = getSpeeds(codingWordsPerMinute);
     
-    const unitsPerWord = 50;
+    // PARIS has 43units + 7 space units.
+    const unitsPerWord = 43;
     const codingTimePerMinute = effectiveWordsPerMinute * unitsPerWord * codingSpeeds.dit_duration_seconds;
 
     const secondsPerMinute = 60;
@@ -106,10 +107,14 @@ export function getKochSpeeds(codingWordsPerMinute: number, effectiveWordsPerMin
 
 export function generateMorseNotes(context: AudioContext, message: string, options: {
     frequencyInHertz: number,
+    codingSpeed: number,
+    effectiveSpeed: number,
 } = {
     frequencyInHertz: 443,
+    codingSpeed: 12,
+    effectiveSpeed: 12,
 }): INote[] {
-    const speeds = getKochSpeeds(20, 12);
+    const speeds = getKochSpeeds(options.codingSpeed, options.effectiveSpeed);
     const words = message.split(" ");
     const notes = words.reduce<INote[]>((currentWordNotes, word) => {
         const isFirstWord = (currentWordNotes.length === 0);
@@ -167,7 +172,7 @@ export function generateMorseNotes(context: AudioContext, message: string, optio
                 const note = generateSineNote({
                     context: context, 
                     duration: duration,
-                    frequencyInHertz: frequency, 
+                    frequencyInHertz: frequency,
                     timeFromNowInSeconds: timeOffset
                 });
                 return [
