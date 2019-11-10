@@ -1,7 +1,7 @@
 import React from "react";
 
 import Scheduler, { INote } from "./audio/Scheduler";
-import { generateMorseNotes } from "./audio/morse";
+import { generateMorseNotes, INTER_WORD_DURATION } from "./audio/morse";
 import MainView from "./view/MainView";
 import LessonPlan, { QuizMode } from "./LessonPlan";
 
@@ -64,12 +64,14 @@ export default class Main extends React.Component<{}, MainState>
             (this.state.cachedLessonState.wordId != prevState.cachedLessonState?.wordId))
         if (nowCachedLessonState ||
             hasWordIdChanged) {
-            if (this.state.cachedLessonState && this.state.cachedLessonState.currentWord) {
-                // New word! Play it.
-                const notes = generateMorseNotes(this.audioContext, this.state.cachedLessonState.currentWord);
-                this.scheduler.clear();
-                this.scheduler.scheduleNotes(notes);
-            }
+            setTimeout(() => {
+                if (this.state.cachedLessonState && this.state.cachedLessonState.currentWord) {
+                    // New word! Play it. Set a delay to not jolt people.
+                    const notes = generateMorseNotes(this.audioContext, this.state.cachedLessonState.currentWord);
+                    this.scheduler.clear();
+                    this.scheduler.scheduleNotes(notes);
+                }
+            }, INTER_WORD_DURATION * 1000);
         }
     }
 

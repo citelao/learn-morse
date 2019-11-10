@@ -33,10 +33,11 @@ function getMorseForCharacter(char: string) {
 // 1050 * DIT = 60s
 // DIT = .057142857s
 
-const DIT_DURATION = 0.06;
-const DART_DURATION = 3 * DIT_DURATION;
-const INTER_POINT_DURATION = DIT_DURATION;
-const INTER_CHARACTER_DURATION = 3 * DART_DURATION;
+export const DIT_DURATION = 0.06;
+export const DART_DURATION = 3 * DIT_DURATION;
+export const INTER_POINT_DURATION = DIT_DURATION;
+export const INTER_CHARACTER_DURATION = DART_DURATION;
+export const INTER_WORD_DURATION = 7 * DIT_DURATION;
 
 export function generateMorseNotes(context: AudioContext, message: string, options: {
     frequencyInHertz: number,
