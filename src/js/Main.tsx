@@ -89,8 +89,10 @@ export default class Main extends React.Component<{}, MainState>
                 // fallthrough
             case QuizMode.InvisibleSingle:
                 return "(type the letter you hear)";
-            case QuizMode.InvisibleWords:
+            case QuizMode.InvisibleWord:
                 return "(type the words you hear)";
+            case QuizMode.InvisiblePhrase:
+                return "(translate several words as they come)";
         }
     }
 
