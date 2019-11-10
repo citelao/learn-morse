@@ -1,7 +1,7 @@
 import React from "react";
 
 import Scheduler, { INote } from "./audio/Scheduler";
-import { generateMorseNotes, INTER_WORD_DURATION } from "./audio/morse";
+import { generateMorseNotes, INTER_WORD_DURATION, getKochSpeeds } from "./audio/morse";
 import MainView from "./view/MainView";
 import LessonPlan, { QuizMode } from "./LessonPlan";
 
@@ -73,7 +73,7 @@ export default class Main extends React.Component<{}, MainState>
                     this.scheduler.clear();
                     this.scheduler.scheduleNotes(notes);
                 }
-            }, INTER_WORD_DURATION * 1000);
+            }, getKochSpeeds(20, 6).inter_word_duration_seconds * 1000);
         }
     }
 

@@ -48,7 +48,7 @@ export default class LessonPlan {
     public static create() {
         // Create a basic LessonPlan
         return new LessonPlan({
-            currentLesson: 1,
+            currentLesson: 3,
             quizMode: QuizMode.VisibleSingle,
             currentWord: null,
             wordId: null,

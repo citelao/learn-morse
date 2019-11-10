@@ -20,30 +20,105 @@ function getMorseForCharacter(char: string) {
     return morse;
 }
 
-// Our letter time should be ~20WPM.
-// Assume 5 letters/word, 4 points/letter, 50% dits
-// ((2 * DIT + 2 * DART) * 5 + INTER_POINT * 4) * 20 + INTER_WORD * 19 = 60s
-// DART = 3 * DIT
-// INTER_POINT = DIT
-// INTER_WORD = 3 * DART = 9 * DIT
-// ((2 * DIT + 6 * DIT) * 5 + DIT * 4) * 20 + (9 * DIT) * 19 = 60s
-// ((8 * DIT) * 5 + DIT * 4) * 20 + (9 * DIT) * 19 = 60s
-// (44 * DIT) * 20 + (171 * DIT) = 60s
-// 880 * DIT + 171 * DIT = 60s
-// 1050 * DIT = 60s
-// DIT = .057142857s
+export interface ISpeeds {
+    dit_duration_seconds: number;
+    dart_duration_seconds: number;
+    inter_symbol_duration_seconds: number;
+    inter_character_duration_seconds: number;
+    inter_word_duration_seconds: number;
+}
 
-export const DIT_DURATION = 0.06;
-export const DART_DURATION = 3 * DIT_DURATION;
-export const INTER_POINT_DURATION = DIT_DURATION;
-export const INTER_CHARACTER_DURATION = DART_DURATION;
-export const INTER_WORD_DURATION = 7 * DIT_DURATION;
+export function getSpeeds(wordsPerMinute: number): ISpeeds {
+    // Assumptions:
+    // const lettersPerWord = 5;
+    // const pointsPerLetter = 4
+    // const ditsVersusDartsPercentage = 0.5;
+
+    // For:
+    // - `n` wpm,
+    // - `l` letters per word,
+    // - `p` points per letter,
+    // - `d` dits versus darts percentage (decimal)
+    //
+    // Letter duration:
+    // `j = (d * p * DIT_DURATION + (1 - d) * p * DART_DURATION) + (p - 1) * INTER_SYMBOL_DURATION`
+    //
+    // Word duration:
+    // `k = j * l + (l - 1) * INTER_CHARACTER_DURATION`
+    //
+    // Words per minute:
+    // `60sec = n * k + (n - 1) * INTER_WORD_DURATION`
+    //
+    // Solve for n:
+    //
+    // 60sec = n * k + n * INTER_WORD_DURATION - INTER_WORD_DURATION
+    // => 60sec = n * (k + INTER_WORD_DURATION) - INTER_WORD_DURATION
+    // => (60sec + INTER_WORD_DURATION) / (k + INTER_WORD_DURATION) = n
+    //
+    // Expand `k`:
+    //
+    // n = (60sec + INTER_WORD_DURATION) / (k + INTER_WORD_DURATION)
+    // n = (60sec + INTER_WORD_DURATION) / ((j * l + (l - 1) * INTER_CHARACTER_DURATION) + INTER_WORD_DURATION)
+    // n = (60sec + INTER_WORD_DURATION) / ((((d * p * DIT_DURATION + (1 - d) * p * DART_DURATION) + (p - 1) * INTER_SYMBOL_DURATION) * l + (l - 1) * INTER_CHARACTER_DURATION) + INTER_WORD_DURATION)
+    //
+    // Great, now use the ratios of spacing:
+    // - DIT_DURATION = 1tu
+    // - DART_DURATION = 3tu
+    // - INTER_POINT_DURATION = 1tu
+    // - INTER_CHARACTER_DURATION = 3tu
+    // - INTER_WORD_DURATION = 7tu
+    //
+    // Solving on paper:
+    const unitsPerMinute = 74 * wordsPerMinute - 7;
+    const minutesPerUnite = 1 / unitsPerMinute;
+    const secondsPerMinute = 60;
+    const secondsPerUnit = secondsPerMinute * minutesPerUnite;
+
+    const speeds: ISpeeds = {
+        dit_duration_seconds: secondsPerUnit,
+        dart_duration_seconds: 3 * secondsPerUnit,
+        inter_symbol_duration_seconds: secondsPerUnit,
+        inter_character_duration_seconds: 3 * secondsPerUnit,
+        inter_word_duration_seconds: 7 * secondsPerUnit
+    };
+    return speeds;
+}
+
+export function getKochSpeeds(codingWordsPerMinute: number, effectiveWordsPerMinute: number): ISpeeds {
+    const codingSpeeds = getSpeeds(codingWordsPerMinute);
+
+    const symbolsPerLetter = 4
+    const ditsVersusDartsPercentage = 0.5;
+    const letterDuration = (
+        (
+            (symbolsPerLetter * ditsVersusDartsPercentage * codingSpeeds.dit_duration_seconds)
+            - (symbolsPerLetter * (1 - ditsVersusDartsPercentage) * codingSpeeds.dart_duration_seconds)
+        ) + (symbolsPerLetter - 1) * codingSpeeds.inter_symbol_duration_seconds
+    );
+
+    const lettersPerWord = 5;
+    const wordDuration = lettersPerWord * letterDuration + (lettersPerWord - 1) * codingSpeeds.inter_word_duration_seconds;
+    
+    const totalWordDuration = wordDuration * effectiveWordsPerMinute;
+    const totalWordPauses = 1 - totalWordDuration;
+
+    const inter_word_duration = totalWordPauses / (1 - effectiveWordsPerMinute);
+    const speeds: ISpeeds = {
+        dit_duration_seconds: codingSpeeds.dit_duration_seconds,
+        dart_duration_seconds: codingSpeeds.dart_duration_seconds,
+        inter_symbol_duration_seconds: codingSpeeds.inter_symbol_duration_seconds,
+        inter_character_duration_seconds: codingSpeeds.inter_character_duration_seconds,
+        inter_word_duration_seconds: inter_word_duration
+    };
+    return speeds;
+}
 
 export function generateMorseNotes(context: AudioContext, message: string, options: {
     frequencyInHertz: number,
 } = {
     frequencyInHertz: 443,
 }): INote[] {
+    const speeds = getSpeeds(20);
     const chars = message.split("");
     const notes = chars.reduce<INote[]>((currentMorseChars, char) => {
         const isFirstCharacter = (currentMorseChars.length === 0);
@@ -57,16 +132,16 @@ export function generateMorseNotes(context: AudioContext, message: string, optio
                     timeOffset = 0;
                 } else {
                     const previousCharacterPoint = currentMorseChars[currentMorseChars.length - 1];
-                    timeOffset = previousCharacterPoint.timeFromNowInSeconds + INTER_CHARACTER_DURATION;
+                    timeOffset = previousCharacterPoint.timeFromNowInSeconds + speeds.inter_character_duration_seconds;
                 }
             } else {
                 const previousPoint = currentPoints[currentPoints.length - 1];
-                timeOffset = previousPoint.timeFromNowInSeconds + INTER_POINT_DURATION;
+                timeOffset = previousPoint.timeFromNowInSeconds + speeds.inter_symbol_duration_seconds;
             }
             
             const duration = (point === "-")
-                ? DART_DURATION
-                : DIT_DURATION;
+                ? speeds.dart_duration_seconds
+                : speeds.dit_duration_seconds;
             const note = generateSineNote({
                 context: context, 
                 duration: duration,
