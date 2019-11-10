@@ -8,16 +8,32 @@ function createAudioContext(): AudioContext {
 }
 
 interface MainState {
-    currentLetters: string[]
+    currentLesson: number
+}
+
+const LETTER_SERIES = [
+    "k",
+    "m",
+    "u"
+];
+
+function generateWordForLesson(currentLesson: number): string {
+    const availableLetters = LETTER_SERIES.slice(0, currentLesson);
+
+    const LENGTH = 5;
+    let word = "";
+    for(let i = 0; i < LENGTH; i++) {
+        const randomIndex = Math.floor(Math.random() * (availableLetters.length - 1));
+        word += availableLetters[randomIndex];
+    }
+
+    return word
 }
 
 export default class Main extends React.Component<{}, MainState>
 {
     state = {
-        currentLetters: [
-            "m",
-            "k"
-        ]
+        currentLesson: 1,
     };
 
     private audioContext: AudioContext;
@@ -32,10 +48,6 @@ export default class Main extends React.Component<{}, MainState>
     }
 
     componentDidMount() {
-        setTimeout(() => {
-            const notes = generateMorseNotes(this.audioContext, 'kmmkk');
-            this.scheduler.scheduleNotes(notes);
-        }, 300);
     }
 
     render()
@@ -43,8 +55,16 @@ export default class Main extends React.Component<{}, MainState>
         return (
             <section className="main">
                 <div className="letter">v</div>
-                <input type="text" />
+                <button onClick={this.handleBegin}>Begin!</button>
             </section>
         );
+    }
+
+    private handleBegin = () => {
+        const word = generateWordForLesson(this.state.currentLesson);
+        console.log(word);
+        const notes = generateMorseNotes(this.audioContext, word);
+        this.scheduler.clear();
+        this.scheduler.scheduleNotes(notes);
     }
 }

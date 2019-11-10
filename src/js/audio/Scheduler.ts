@@ -42,8 +42,13 @@ export default class Scheduler {
                 startTime: currentTime + note.timeFromNowInSeconds
             };
             this.queuedNotes.push(scheduledNote);
-            console.log(scheduledNote);
+            // console.log(scheduledNote);
         });
+    }
+
+    public clear() {
+        // TODO: this cannot cancel notes well. We need to shut off all oscillators.
+        this.queuedNotes = [];
     }
 
     private handleAnimationFrame = () => {
@@ -52,7 +57,7 @@ export default class Scheduler {
         while (this.queuedNotes.length > 0 && this.queuedNotes[0].startTime < frameTime) {
             const playedNote = this.queuedNotes.splice(0, 1)[0];
             playedNote.callback(frameTime);
-            console.log(frameTime);
+            // console.log(frameTime);
         }
 
         // this.window.requestAnimationFrame(this.handleAnimationFrame);
