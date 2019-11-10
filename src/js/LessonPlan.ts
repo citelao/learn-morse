@@ -1,9 +1,14 @@
+export enum QuizMode {
+    VisibleSingle = 1,
+    InvisibleSingle = 2,
+    InvisibleWords = 3,
+}
+
 /** LessonPlan is designed to be trivially serializable to JSON. */
 export interface ILessonPlanState {
     currentLesson: number,
 
-    isIntroducing: boolean,
-    isSoftlyIntroducing: boolean,
+    quizMode: QuizMode,
 
     currentWord: string | null,
     wordId: number | null,
@@ -46,8 +51,7 @@ export default class LessonPlan {
         // Create a basic LessonPlan
         return new LessonPlan({
             currentLesson: 1,
-            isIntroducing: true,
-            isSoftlyIntroducing: false,
+            quizMode: QuizMode.VisibleSingle,
             currentWord: null,
             wordId: null,
             shouldShowWord: false,
@@ -72,6 +76,10 @@ export default class LessonPlan {
         return this.state.shouldShowWord;
     }
 
+    public getQuizMode(): QuizMode {
+        return this.state.quizMode;
+    }
+
     public registerListener(callback: LessonPlanStateChangeListener) {
         this.listeners.push(callback);
     }
@@ -91,17 +99,16 @@ export default class LessonPlan {
                 // On success.
 
                 // Update the state:
-                if (this.state.isIntroducing && !this.state.isSoftlyIntroducing) {
-                    this.state.isSoftlyIntroducing = true;
-
+                if (this.state.quizMode === QuizMode.VisibleSingle) {
                     // Special-case the first letter, since we already just learned it.
                     if (this.state.currentLesson === 1) {
                         this.state.currentLesson += 1;
-                        this.state.isIntroducing = true;
-                        this.state.isSoftlyIntroducing = false;
+                        this.state.quizMode = QuizMode.VisibleSingle;
+                    } else {
+                        this.state.quizMode = QuizMode.InvisibleSingle;
                     }
-                } else if(this.state.isIntroducing) {
-                    this.state.isIntroducing = false;
+                } else if(this.state.quizMode === QuizMode.InvisibleSingle) {
+                    this.state.quizMode = QuizMode.InvisibleWords;
                 }
 
                 // Generate a new word:
@@ -122,13 +129,13 @@ export default class LessonPlan {
     }
 
     private getNewWord(): INewWord {
-        const word = (this.state.isIntroducing)
+        const word = (this.state.quizMode === QuizMode.VisibleSingle || this.state.quizMode === QuizMode.InvisibleSingle)
             ? LETTER_SERIES[this.state.currentLesson - 1]
             : generateWordForLesson(this.state.currentLesson);
         
         const newWord: INewWord = {
             word: word,
-            shouldShowWord: (this.state.isIntroducing && !this.state.isSoftlyIntroducing)
+            shouldShowWord: (this.state.quizMode === QuizMode.VisibleSingle)
         };
         return newWord;
     }
