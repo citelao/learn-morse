@@ -1,7 +1,24 @@
 import { INote } from "./Scheduler";
 import { generateSineNote } from "./sine";
 
-function getMorseForCharacter(char: string) {
+type MorseSymbol = "-" | ".";
+function isMorseSymbol(char: string): char is MorseSymbol {
+    return (char === "-" || char === ".");
+}
+
+function parseMorseSymbols(symbols: string): MorseSymbol[] {
+    const chars = symbols.split("");
+    
+    // Validate the string:
+    const isValid = chars.every((char) => isMorseSymbol);
+    if (!isValid) {
+        throw new Error(`Invalid morse symbols in '${symbols}'`);
+    }
+
+    return (chars as MorseSymbol[]);
+}
+
+function getMorseForCharacter(char: string): MorseSymbol[] {
     const MORSE_ALPHABET: { [key: string]: string } = {
         "k": "-.-",
         "m": "--",
@@ -17,7 +34,7 @@ function getMorseForCharacter(char: string) {
         throw new Error(`Don't know morse for ${char}`);
     }
 
-    return morse;
+    return parseMorseSymbols(morse);
 }
 
 export interface ISpeeds {
@@ -123,7 +140,7 @@ export function generateMorseNotes(context: AudioContext, message: string, optio
     const notes = chars.reduce<INote[]>((currentMorseChars, char) => {
         const isFirstCharacter = (currentMorseChars.length === 0);
 
-        const points = getMorseForCharacter(char).split("");
+        const points = getMorseForCharacter(char);
         const notes = points.reduce<INote[]>((currentPoints, point, pointIndex) => {
             const isFirstPointInCharacter = (currentPoints.length === 0);
             let timeOffset = 0;
@@ -139,9 +156,15 @@ export function generateMorseNotes(context: AudioContext, message: string, optio
                 timeOffset = previousPoint.timeFromNowInSeconds + speeds.inter_symbol_duration_seconds;
             }
             
-            const duration = (point === "-")
-                ? speeds.dart_duration_seconds
-                : speeds.dit_duration_seconds;
+            const duration = ((point: MorseSymbol): number => {
+                switch(point) {
+                    case "-":
+                        return speeds.dart_duration_seconds;
+                    case ".":
+                        return speeds.dit_duration_seconds;
+                }
+            })(point);
+            
             const note = generateSineNote({
                 context: context, 
                 duration: duration,
