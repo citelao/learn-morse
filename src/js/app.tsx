@@ -35,7 +35,20 @@ function getMorseForCharacter(char: string) {
     return morse;
 }
 
-const DIT_DURATION = 0.5;
+// Our letter time should be ~20WPM.
+// Assume 5 letters/word, 4 points/letter, 50% dits
+// ((2 * DIT + 2 * DART) * 5 + INTER_POINT * 4) * 20 + INTER_WORD * 19 = 60s
+// DART = 3 * DIT
+// INTER_POINT = DIT
+// INTER_WORD = 3 * DART = 9 * DIT
+// ((2 * DIT + 6 * DIT) * 5 + DIT * 4) * 20 + (9 * DIT) * 19 = 60s
+// ((8 * DIT) * 5 + DIT * 4) * 20 + (9 * DIT) * 19 = 60s
+// (44 * DIT) * 20 + (171 * DIT) = 60s
+// 880 * DIT + 171 * DIT = 60s
+// 1050 * DIT = 60s
+// DIT = .057142857s
+
+const DIT_DURATION = 0.06;
 const DART_DURATION = 3 * DIT_DURATION;
 const INTER_POINT_DURATION = DIT_DURATION;
 const INTER_CHARACTER_DURATION = 3 * DART_DURATION;
@@ -45,31 +58,14 @@ function generateMorseNotes(letters: string, options: {
 } = {
     frequencyInHertz: 443,
 }): INote[] {
-    const morse = letters.split("").map(getMorseForCharacter);
-
-    // const notes = morse.reduce<INote[]>((noteArray, morseChar, letterIndex) => {
-    //     const notesForCharacter = morseChar.split("").reduce<INote[]>((noteArray, point, pointIndex) => {
-    //         const offsetTime = (noteArray.length == 0)
-    //             ? 0
-    //             : noteArray[-1].timeFromNowInSeconds + INTER_POINT_DURATION;
-    //         const note = (point == "-")
-    //             ? generateSineNote({ context: context, duration: 0.6, frequencyInHertz: 443, timeFromNowInSeconds: offsetTime })
-    //             : generateSineNote({ context: context, duration: 0.2, frequencyInHertz: 886, timeFromNowInSeconds: offsetTime });
-
-    //         return [
-    //             ...noteArray,
-    //             ...note
-    //         ];
-    //     }, []);
-
-    //     return [
-    //         ...noteArray,
-    //         ...notesForCharacter
-    //     ];
-    // }, []);
-
-    // return notes;
-    return [];
+    // const morse = letters.split("").map(getMorseForCharacter);
+    const FREQUENCY = 443;
+    const notes = [
+        ... generateSineNote({ context: context, duration: DART_DURATION, frequencyInHertz: FREQUENCY, timeFromNowInSeconds: 0 }),
+        ... generateSineNote({ context: context, duration: DIT_DURATION, frequencyInHertz: FREQUENCY, timeFromNowInSeconds: DART_DURATION + INTER_POINT_DURATION }),
+        ... generateSineNote({ context: context, duration: DART_DURATION, frequencyInHertz: FREQUENCY, timeFromNowInSeconds: DART_DURATION + 2 * INTER_POINT_DURATION + DIT_DURATION }),
+    ];
+    return notes;
 }
 
 const context = createAudioContext();
@@ -77,13 +73,6 @@ const scheduler = new Scheduler(window, context);
 scheduler.start();
 
 setTimeout(() => {
-    // const notes = generateMorseNotes('k');
-    const FREQUENCY = 443;
-    const notes = [
-        ... generateSineNote({ context: context, duration: DART_DURATION, frequencyInHertz: FREQUENCY, timeFromNowInSeconds: 0 }),
-        ... generateSineNote({ context: context, duration: DIT_DURATION, frequencyInHertz: FREQUENCY, timeFromNowInSeconds: DART_DURATION + INTER_POINT_DURATION }),
-        ... generateSineNote({ context: context, duration: DART_DURATION, frequencyInHertz: FREQUENCY, timeFromNowInSeconds: DART_DURATION + 2 * INTER_POINT_DURATION + DIT_DURATION }),
-    ];
-    
+    const notes = generateMorseNotes('k');
     scheduler.scheduleNotes(notes);
 }, 30);
