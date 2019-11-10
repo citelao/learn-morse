@@ -20,10 +20,8 @@ export interface ILessonPlanState {
     wordId: number | null,
     currentGuess: string,
 
-    guessHistory: IGuess[]
+    guessHistory: IGuess[],
 }
-
-export type LessonPlanStateChangeListener = () => void;
 
 const LETTER_SERIES = [
     "k",
@@ -44,10 +42,111 @@ function generateWordForLesson(currentLesson: number): string {
     return word;
 }
 
+function getNewWord(args: {
+    quizMode: QuizMode,
+    currentLesson: number
+}): INewWord {
+    const word = (args.quizMode === QuizMode.VisibleSingle || args.quizMode === QuizMode.InvisibleSingle)
+        ? LETTER_SERIES[args.currentLesson - 1]
+        : generateWordForLesson(args.currentLesson);
+    
+    const newWord: INewWord = {
+        word: word,
+    };
+    return newWord;
+}
+
 /** Internal interface for generating words */
 interface INewWord {
     word: string;
 }
+
+interface IAction {
+    newGuess?: string;
+    begin?: boolean;
+}
+
+function getNextStatePartial(currentState: ILessonPlanState, action: IAction): Partial<ILessonPlanState> {    
+    if (action.begin) {
+        const newWord = getNewWord({
+            currentLesson: currentState.currentLesson,
+            quizMode: currentState.quizMode
+        });
+
+        return {
+            currentWord: newWord.word,
+            wordId: (currentState.wordId || 0) + 1,
+            currentGuess: "",
+        };
+    } else if (action.newGuess) {
+        if(action.newGuess.length === currentState.currentWord?.length) {
+            if (currentState.quizMode === QuizMode.InvisiblePhrase) {
+                // TODO. Phrase mode (Koch mode) is weird.
+            } else {
+                if (action.newGuess == currentState.currentWord) {
+                    // On success.
+                    let partial: Partial<ILessonPlanState> = {};
+                    if (currentState.quizMode === QuizMode.VisibleSingle) {
+                        // Special-case the first letter, since we already just learned it.
+                        if (currentState.currentLesson === 1) {
+                            partial = {
+                                currentLesson: currentState.currentLesson + 1,
+                                quizMode: QuizMode.VisibleSingle,
+                            };
+                        } else {
+                            partial = {
+                                quizMode: QuizMode.InvisibleSingle
+                            };
+                        }
+                    } else if(currentState.quizMode === QuizMode.InvisibleSingle) {
+                        partial = {
+                            quizMode: QuizMode.InvisibleWord
+                        };
+                    } else if (currentState.quizMode === QuizMode.InvisibleWord){
+                        // no-op
+                    } else {
+                        throw new Error("Unreachable");
+                    }
+
+                    // Generate a new word?
+                    const newWord = getNewWord({
+                        currentLesson: partial.currentLesson || currentState.currentLesson,
+                        quizMode: partial.quizMode!
+                    });
+                    Object.assign(partial, {
+                        currentWord: newWord.word,
+                        wordId: (currentState.wordId || 0) + 1,
+                        currentGuess: "",
+                    });
+
+                    return partial;
+                } else {
+                    console.log("hi")
+
+                    // Oh no! a failed guess.
+                    return {
+                        currentGuess: ""
+                    };
+                }
+            }
+        } else {
+            return {
+                currentGuess: action.newGuess
+            };
+        }
+    }
+
+    return {};
+}
+
+function getNextState(currentState: ILessonPlanState, action: IAction): ILessonPlanState {
+    const updates = getNextStatePartial(currentState, action);
+    const newState = Object.assign({}, currentState, updates);
+    console.log(newState);
+    return newState;
+}
+
+export type LessonPlanStateChangeListener = () => void;
 
 export default class LessonPlan {
     private state: ILessonPlanState;
@@ -96,62 +195,13 @@ export default class LessonPlan {
     }
 
     public begin() {
-        const newWord = this.getNewWord();
-        this.state.currentWord = newWord.word;
-        this.state.wordId = (this.state.wordId || 0) + 1;
-        this.state.currentGuess = "";
+        this.state = getNextState(this.state, { begin: true});
         this.updateListeners();
     }
 
     public handleGuess(guess: string) {
-        this.state.currentGuess = guess;
-        if(this.state.currentGuess.length === this.state.currentWord?.length) {
-            this.state.guessHistory.push({
-                guess: this.state.currentGuess
-            });
-
-            if (this.state.quizMode === QuizMode.InvisiblePhrase) {
-                // TODO. Phrase mode (Koch mode) is weird.
-            } else {
-                if (this.state.currentGuess == this.state.currentWord) {
-                    // On success.
-    
-                    // Update the state:
-                    if (this.state.quizMode === QuizMode.VisibleSingle) {
-                        // Special-case the first letter, since we already just learned it.
-                        if (this.state.currentLesson === 1) {
-                            this.state.currentLesson += 1;
-                            this.state.quizMode = QuizMode.VisibleSingle;
-                        } else {
-                            this.state.quizMode = QuizMode.InvisibleSingle;
-                        }
-                    } else if(this.state.quizMode === QuizMode.InvisibleSingle) {
-                        this.state.quizMode = QuizMode.InvisibleWord;
-                    }
-    
-                    // Generate a new word:
-                    this.begin();
-                } else {
-                    // Oh no! a failed guess.
-                    this.state.currentGuess = "";
-                }
-            }
-        } else {
-            // TODO: queue word grading
-        }
-
+        this.state = getNextState(this.state, { newGuess: guess });
         this.updateListeners();
-    }
-
-    private getNewWord(): INewWord {
-        const word = (this.state.quizMode === QuizMode.VisibleSingle || this.state.quizMode === QuizMode.InvisibleSingle)
-            ? LETTER_SERIES[this.state.currentLesson - 1]
-            : generateWordForLesson(this.state.currentLesson);
-        
-        const newWord: INewWord = {
-            word: word,
-        };
-        return newWord;
     }
 
     private updateListeners() {
