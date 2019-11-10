@@ -6,6 +6,7 @@ import MainView from "./view/MainView";
 import LessonPlan, { QuizMode, IGuess } from "./LessonPlan";
 import ListeningTutorialView from "./view/ListeningTutorialView";
 import BeginView from "./view/BeginView";
+import IntroduceLetter from "./IntroduceLetter";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -38,6 +39,8 @@ type AppState =
     "introduce_letter" |
     "tutorial_phrase_practice" |
     "phrase_practice";
+
+const ENABLE_LISTENING_PRACTICE = false;
 
 interface MainState {
     appState: AppState,
@@ -72,9 +75,10 @@ export default class Main extends React.Component<{}, MainState>
 
     componentDidUpdate(prevProps: {}, prevState: MainState) {
         if (this.state.appState != prevState.appState) {
-            if (this.state.appState === "introduce_listening") {
-                this.state.currentLesson.begin();
-            }
+            // if (this.)
+            // if (this.state.appState === "introduce_listening") {
+            //     this.state.currentLesson.begin();
+            // }
         }
 
         const nowCachedLessonState = this.state.cachedLessonState && !prevState.cachedLessonState;
@@ -86,9 +90,7 @@ export default class Main extends React.Component<{}, MainState>
             setTimeout(() => {
                 if (this.state.cachedLessonState && this.state.cachedLessonState.currentWord) {
                     // New word! Play it. Set a delay to not jolt people.
-                    const notes = generateMorseNotes(this.audioContext, this.state.cachedLessonState.currentWord);
-                    this.scheduler.clear();
-                    this.scheduler.scheduleNotes(notes);
+                    this.renderMorse(this.state.cachedLessonState.currentWord);
                 }
             }, getKochSpeeds(20, 6).inter_word_duration_seconds * 1000);
         }
@@ -101,9 +103,7 @@ export default class Main extends React.Component<{}, MainState>
             if (this.state.cachedLessonState && this.state.cachedLessonState.currentPhrase) {
                 // New phrase! Play it. Set a delay to not jolt people.
                 const phrase = this.state.cachedLessonState?.currentPhrase.join(" ");
-                const notes = generateMorseNotes(this.audioContext, phrase);
-                this.scheduler.clear();
-                this.scheduler.scheduleNotes(notes);
+                this.renderMorse(phrase);
             }
         }
     }
@@ -134,6 +134,11 @@ export default class Main extends React.Component<{}, MainState>
                 return <ListeningTutorialView onBegin={this.handleBegin} />;
             case "introduce_listening":
                 return this.renderListeningPractice();
+            case "introduce_letter":
+                return <IntroduceLetter
+                    letter="k"
+                    onRequestRenderMorse={this.renderMorse}
+                    onStopRequest={this.handleStopRequest} />;
             default:
                 // Nothing.
         }
@@ -145,42 +150,57 @@ export default class Main extends React.Component<{}, MainState>
         const guessHistory = this.state.cachedLessonState?.guessHistory || [];
         return (
             <MainView
-                hasStarted={this.state.appState !== "unstarted"}
                 shownWord={shownWord}
                 statusMessage={this.getStatusMessage()}
                 currentGuess={this.state.cachedLessonState?.currentGuess || ""}
                 guessHistory={guessHistory}
-                onBegin={this.handleBegin}
                 onGuess={this.handleGuess}
                 onStopRequest={this.handleStopRequest} />
         );
     }
 
     private renderListeningPractice() {
+        // TODO: this mode is not fully implemented.
+
+        const handleGuess = (complete_guess: string): boolean => {
+            return false;
+        };
+
         return (
             <MainView
-                hasStarted={true}
-                shownWord={"k"}
-                statusMessage={"TODO"}
+                shownWord={null}
+                statusMessage={"(type any letter when you hear a letter, and type a space when you hear a space)"}
                 currentGuess={""}
                 guessHistory={[]}
-                onBegin={this.handleBegin}
-                onGuess={this.handleGuess}
+                onGuess={handleGuess}
                 onStopRequest={this.handleStopRequest} />
         );
     }
 
     private handleBegin = () => {
         if (this.state.appState === "unstarted") {
-            this.setState({
-                appState: "tutorial_listening",
-            });
+            if (ENABLE_LISTENING_PRACTICE) {
+                this.setState({
+                    appState: "tutorial_listening",
+                });
+            } else {
+                this.audioContext.resume();
+                this.setState({
+                    appState: "introduce_letter",
+                });
+            }
         } else if (this.state.appState === "tutorial_listening") {
             this.audioContext.resume();
             this.setState({
                 appState: "introduce_listening",
             });
         }
+    }
+
+    private renderMorse = (phrase: string) => {
+        const notes = generateMorseNotes(this.audioContext, phrase);
+        this.scheduler.clear();
+        this.scheduler.scheduleNotes(notes);
     }
 
     private handleGuess = (char: string) => {
