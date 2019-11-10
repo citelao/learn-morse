@@ -4,6 +4,7 @@ import React from "react";
 import Main from "./Main";
 import { test } from "./morse";
 import Scheduler, { INote } from "./audio/Scheduler";
+import { generateSineNote } from "./audio/sine";
 
 ReactDOM.render(
     <Main />,
@@ -16,87 +17,72 @@ function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
 }
 
-function createSineOscillator(context: AudioContext, frequencyInHertz: number): OscillatorNode {
-    const osc = context.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(frequencyInHertz, context.currentTime);
-    return osc;
+function getMorseForCharacter(char: string) {
+    const MORSE_ALPHABET: { [key: string]: string } = {
+        "k": "-.-",
+        "m": "--"
+    };
+
+    if (char.length > 1) {
+        throw new Error(`Use only one char. (${char})`);
+    }
+
+    const morse = MORSE_ALPHABET[char];
+    if (!morse) {
+        throw new Error(`Don't know morse for ${char}`);
+    }
+
+    return morse;
 }
 
-/** Represents an oscillator attached to a gain node. */
-interface IOscillatorPair {
-    oscillator: OscillatorNode,
-    gain: GainNode
-};
+const DIT_DURATION = 0.5;
+const DART_DURATION = 3 * DIT_DURATION;
+const INTER_POINT_DURATION = DIT_DURATION;
+const INTER_CHARACTER_DURATION = 3 * DART_DURATION;
 
-/**
- * Create a sine oscillator connected to a gain node.
- * 
- * The oscillator is always "playing," but the gain node is set to 0.
- */
-function createPleasantSineOscillator(context: AudioContext, frequencyInHertz: number): IOscillatorPair
-{
-    const osc = createSineOscillator(context, frequencyInHertz);
-    const gain = context.createGain();
+function generateMorseNotes(letters: string, options: {
+    frequencyInHertz: number,
+} = {
+    frequencyInHertz: 443,
+}): INote[] {
+    const morse = letters.split("").map(getMorseForCharacter);
 
-    gain.gain.setValueAtTime(0, context.currentTime);
-    osc.connect(gain);
-    osc.start();
+    // const notes = morse.reduce<INote[]>((noteArray, morseChar, letterIndex) => {
+    //     const notesForCharacter = morseChar.split("").reduce<INote[]>((noteArray, point, pointIndex) => {
+    //         const offsetTime = (noteArray.length == 0)
+    //             ? 0
+    //             : noteArray[-1].timeFromNowInSeconds + INTER_POINT_DURATION;
+    //         const note = (point == "-")
+    //             ? generateSineNote({ context: context, duration: 0.6, frequencyInHertz: 443, timeFromNowInSeconds: offsetTime })
+    //             : generateSineNote({ context: context, duration: 0.2, frequencyInHertz: 886, timeFromNowInSeconds: offsetTime });
 
-    return {
-        oscillator: osc,
-        gain: gain
-    };
+    //         return [
+    //             ...noteArray,
+    //             ...note
+    //         ];
+    //     }, []);
+
+    //     return [
+    //         ...noteArray,
+    //         ...notesForCharacter
+    //     ];
+    // }, []);
+
+    // return notes;
+    return [];
 }
 
 const context = createAudioContext();
 const scheduler = new Scheduler(window, context);
 scheduler.start();
 
-/** A number close to 0 but not quite 0 so we can exponentially decay to it. */
-const EPSILON = 0.00001;
-
-function generateSineNote(options: {
-    duration: number,
-    frequencyInHertz: number,
-    timeFromNowInSeconds?: number
-}): INote[] {
-    const timeFromNowInSeconds = (options.timeFromNowInSeconds) || 0;
-
-    const oscillator = createPleasantSineOscillator(context, options.frequencyInHertz);
-    oscillator.gain.connect(context.destination);
-
-    return [
-        {
-            timeFromNowInSeconds: timeFromNowInSeconds,
-            callback: (currentTime) => {
-                oscillator.gain.gain.setValueAtTime(EPSILON, currentTime);
-                oscillator.gain.gain.exponentialRampToValueAtTime(1, currentTime + 0.05);
-            }
-        },
-        {
-            timeFromNowInSeconds: timeFromNowInSeconds + options.duration,
-            callback: (currentTime) => {
-                oscillator.gain.gain.setValueAtTime(oscillator.gain.gain.value, currentTime);
-                oscillator.gain.gain.exponentialRampToValueAtTime(EPSILON, currentTime + 0.05);
-            }
-        },
-    ];
-}
-
-// const notes = [
-//     ... generateSineNote({ duration: 1, frequencyInHertz: 443 }),
-//     ... generateSineNote({ duration: 2, frequencyInHertz: 886 }),
-//     ... generateSineNote({ duration: 1, frequencyInHertz: 664.5, timeFromNowInSeconds: 1.1 }),
-// ];
-
-// scheduler.scheduleNotes(notes);
-
 setTimeout(() => {
+    // const notes = generateMorseNotes('k');
+    const FREQUENCY = 443;
     const notes = [
-        ... generateSineNote({ duration: 1, frequencyInHertz: 443 }),
-        // ... generateSineNote({ duration: 2, frequencyInHertz: 886 }),
-        // ... generateSineNote({ duration: 1, frequencyInHertz: 664.5, timeFromNowInSeconds: 1 }),
+        ... generateSineNote({ context: context, duration: DART_DURATION, frequencyInHertz: FREQUENCY, timeFromNowInSeconds: 0 }),
+        ... generateSineNote({ context: context, duration: DIT_DURATION, frequencyInHertz: FREQUENCY, timeFromNowInSeconds: DART_DURATION + INTER_POINT_DURATION }),
+        ... generateSineNote({ context: context, duration: DART_DURATION, frequencyInHertz: FREQUENCY, timeFromNowInSeconds: DART_DURATION + 2 * INTER_POINT_DURATION + DIT_DURATION }),
     ];
     
     scheduler.scheduleNotes(notes);
