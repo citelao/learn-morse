@@ -5,7 +5,7 @@ import LetterView from "./quiz_view/LetterView";
 import PhraseView from "./quiz_view/PhraseView";
 
 export interface MainViewProperties {
-    shownWord: string | null,
+    letter?: string,
     currentGuess: string,
     guessHistory: IGuess[],
     statusMessage: string | null,
@@ -48,8 +48,8 @@ export default class MainView extends React.Component<MainViewProperties>
             <section className="main">
                 {guessHistory}
                 {
-                    (this.props.shownWord) 
-                        ? <LetterView letter={this.props.shownWord} />
+                    (this.props.letter) 
+                        ? <LetterView letter={this.props.letter} />
                         : null
                 }
                 {/* <PhraseView /> */}

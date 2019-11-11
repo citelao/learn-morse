@@ -60,10 +60,18 @@ interface MainState {
 
 export default class Main extends React.Component<{}, MainState>
 {
+    // state: MainState = {
+    //     appState: "unstarted",
+    //     learningState: {
+    //         currentLesson: 1
+    //     },
+    //     currentLesson: LessonPlan.create(),
+    //     cachedLessonState: null
+    // };
     state: MainState = {
-        appState: "unstarted",
+        appState: "phrase_practice",
         learningState: {
-            currentLesson: 1
+            currentLesson: 2
         },
         currentLesson: LessonPlan.create(),
         cachedLessonState: null
@@ -158,7 +166,7 @@ export default class Main extends React.Component<{}, MainState>
                 return <PhrasePracticeTutorialView onBegin={this.handleBegin} />;
             case "phrase_practice":
                 return <PhrasePractice
-                    phrase=""
+                    phrase={["kmmmkk", "mmkkm"]}
                     onRequestRenderMorse={this.renderMorse}
                     onStopRequest={this.handleStopRequest}
                     onSuccess={this.handleSuccess}
@@ -175,7 +183,6 @@ export default class Main extends React.Component<{}, MainState>
 
         return (
             <MainView
-                shownWord={null}
                 statusMessage={"(type any letter when you hear a letter, and type a space when you hear a space)"}
                 currentGuess={""}
                 guessHistory={[]}

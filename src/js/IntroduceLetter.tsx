@@ -36,7 +36,7 @@ export default class IntroduceLetter extends React.Component<IntroduceLetterProp
     {
         return (
             <MainView
-                shownWord={this.props.letter}
+                letter={this.props.letter}
                 statusMessage={"Type the letter you hear. Press space to repeat."}
                 currentGuess={""}
                 guessHistory={[]}
