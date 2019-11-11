@@ -191,6 +191,7 @@ function getNextState(currentState: ILessonPlanState, action: IAction): ILessonP
 
 export type LessonPlanStateChangeListener = () => void;
 
+// TODO: unused
 export default class LessonPlan {
     private state: ILessonPlanState;
     private listeners: LessonPlanStateChangeListener[];

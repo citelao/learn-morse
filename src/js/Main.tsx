@@ -3,7 +3,7 @@ import React from "react";
 import Scheduler, { INote } from "./audio/Scheduler";
 import { generateMorseNotes, INTER_WORD_DURATION, getKochSpeeds } from "./audio/morse";
 import MainView from "./view/MainView";
-import LessonPlan, { QuizMode, IGuess, getLettersForLesson, generateWordForLesson } from "./LessonPlan";
+import { QuizMode, IGuess, getLettersForLesson, generateWordForLesson } from "./LessonPlan";
 import ListeningTutorialView from "./view/ListeningTutorialView";
 import PhrasePracticeTutorialView from "./view/PhrasePracticeTutorialView";
 import BeginView from "./view/BeginView";
@@ -12,26 +12,6 @@ import PhrasePractice from "./PhrasePractice";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
-}
-
-interface ICachedLessonState {
-    currentWord: string | null;
-    wordId: number | null;
-    currentPhrase: string[] | null;
-    currentGuess: string;
-    guessHistory: IGuess[];
-    quizMode: QuizMode;
-}
-function getCachedLessonState(lessonPlan: LessonPlan) {
-    const state: ICachedLessonState = {
-        currentWord: lessonPlan.getCurrentWord(),
-        wordId: lessonPlan.getWordId(),
-        currentPhrase: lessonPlan.getCurrentPhrase(),
-        currentGuess: lessonPlan.getCurrentGuess(),
-        guessHistory: lessonPlan.getGuessHistory(),
-        quizMode: lessonPlan.getQuizMode(),
-    };
-    return state;
 }
 
 type AppState = 
@@ -58,9 +38,6 @@ interface MainState {
 
     learningState: LearningState,
     lessonState?: LessonState,
-
-    currentLesson: LessonPlan,
-    cachedLessonState: ICachedLessonState | null
 }
 
 function generateLessonState(learningState: LearningState): LessonState {
@@ -78,22 +55,18 @@ function generateLessonState(learningState: LearningState): LessonState {
 
 export default class Main extends React.Component<{}, MainState>
 {
-    // state: MainState = {
-    //     appState: "unstarted",
-    //     learningState: {
-    //         currentLesson: 1
-    //     },
-    //     currentLesson: LessonPlan.create(),
-    //     cachedLessonState: null
-    // };
     state: MainState = {
-        appState: "phrase_practice",
+        appState: "unstarted",
         learningState: {
-            currentLesson: 2
+            currentLesson: 1
         },
-        currentLesson: LessonPlan.create(),
-        cachedLessonState: null
     };
+    // state: MainState = {
+    //     appState: "phrase_practice",
+    //     learningState: {
+    //         currentLesson: 2
+    //     },
+    // };
 
     private audioContext: AudioContext;
     private scheduler: Scheduler;
@@ -104,8 +77,6 @@ export default class Main extends React.Component<{}, MainState>
         this.audioContext = createAudioContext();
         this.scheduler = new Scheduler(window, this.audioContext);
         this.scheduler.start();
-
-        this.state.currentLesson.registerListener(this.handleLessonStateChange);
     }
 
     componentDidMount() {
@@ -122,32 +93,6 @@ export default class Main extends React.Component<{}, MainState>
                 this.setState({
                     lessonState: generateLessonState(this.state.learningState)
                 });
-            }
-        }
-
-        const nowCachedLessonState = this.state.cachedLessonState && !prevState.cachedLessonState;
-        const hasWordIdChanged = (this.state.cachedLessonState && 
-            (this.state.cachedLessonState.wordId != prevState.cachedLessonState?.wordId))
-        const shouldReadNewWords = (this.state.cachedLessonState?.quizMode !== QuizMode.InvisiblePhrase);
-        if (shouldReadNewWords && 
-            (nowCachedLessonState || hasWordIdChanged)) {
-            setTimeout(() => {
-                if (this.state.cachedLessonState && this.state.cachedLessonState.currentWord) {
-                    // New word! Play it. Set a delay to not jolt people.
-                    this.renderMorse(this.state.cachedLessonState.currentWord);
-                }
-            }, getKochSpeeds(20, 6).inter_word_duration_seconds * 1000);
-        }
-
-        const shouldReadNewPhrases = (this.state.cachedLessonState?.quizMode === QuizMode.InvisiblePhrase);
-        const hasPhraseChanged = (this.state.cachedLessonState &&
-            (this.state.cachedLessonState.currentPhrase !== prevState.cachedLessonState?.currentPhrase))
-        if (shouldReadNewPhrases &&
-            (hasPhraseChanged || nowCachedLessonState)) {
-            if (this.state.cachedLessonState && this.state.cachedLessonState.currentPhrase) {
-                // New phrase! Play it. Set a delay to not jolt people.
-                const phrase = this.state.cachedLessonState?.currentPhrase.join(" ");
-                this.renderMorse(phrase);
             }
         }
     }
@@ -254,31 +199,8 @@ export default class Main extends React.Component<{}, MainState>
         this.scheduler.scheduleNotes(notes);
     }
 
-    private handleGuess = (char: string) => {
-        console.log(char);
-
-        if (char === ' ') {
-            // Restart.
-            if (this.state.cachedLessonState && this.state.cachedLessonState.currentWord) {
-                this.renderMorse(this.state.cachedLessonState.currentWord);
-
-                return true;
-            }
-        } else {
-            this.state.currentLesson.handleGuess(char);
-        }
-
-        return false;
-    }
-
     private handleStopRequest = () => {
         console.log("Stopping!")
         this.scheduler.clear();
-    }
-
-    private handleLessonStateChange = () => {
-        this.setState({
-            cachedLessonState: getCachedLessonState(this.state.currentLesson)
-        });
     }
 }
