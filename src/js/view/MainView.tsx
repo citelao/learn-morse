@@ -45,7 +45,7 @@ export default class MainView extends React.Component<MainViewProperties>
         </ol>;
 
         return (
-            <section className="main">
+            <>
                 {guessHistory}
                 {
                     (this.props.letter) 
@@ -66,7 +66,7 @@ export default class MainView extends React.Component<MainViewProperties>
                         : null
                 }
                 <button className="startButton" onClick={this.handleStopRequest}>(stop)</button>
-            </section>
+            </>
         );
     }
 

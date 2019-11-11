@@ -35,13 +35,15 @@ export default class IntroduceLetter extends React.Component<IntroduceLetterProp
     render()
     {
         return (
-            <MainView
-                letter={this.props.letter}
-                statusMessage={"Type the letter you hear. Press space to repeat."}
-                currentGuess={""}
-                guessHistory={[]}
-                onGuess={this.handleGuess}
-                onStopRequest={this.handleStopRequest} />
+            <section className="main">
+                <MainView
+                    letter={this.props.letter}
+                    statusMessage={"Type the letter you hear. Press space to repeat."}
+                    currentGuess={""}
+                    guessHistory={[]}
+                    onGuess={this.handleGuess}
+                    onStopRequest={this.handleStopRequest} />
+            </section>
         );
     }
 

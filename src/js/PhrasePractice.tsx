@@ -49,12 +49,14 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
         });
 
         return (
-            <MainView
-                statusMessage={"Type the phrases you hear."}
-                currentGuess={this.state.pendingGuess}
-                guessHistory={guessHistory}
-                onGuess={this.handleGuess}
-                onStopRequest={this.handleStopRequest} />
+            <section className="main">
+                <MainView
+                    statusMessage={"Type the phrases you hear."}
+                    currentGuess={this.state.pendingGuess}
+                    guessHistory={guessHistory}
+                    onGuess={this.handleGuess}
+                    onStopRequest={this.handleStopRequest} />
+            </section>
         );
     }
 
