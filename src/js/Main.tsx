@@ -1,9 +1,8 @@
 import React from "react";
 
-import Scheduler, { INote } from "./audio/Scheduler";
-import { generateMorseNotes, INTER_WORD_DURATION, getKochSpeeds } from "./audio/morse";
-import MainView from "./view/MainView";
-import { QuizMode, IGuess, getLettersForLesson, generateWordForLesson } from "./LessonPlan";
+import Scheduler from "./audio/Scheduler";
+import { generateMorseNotes } from "./audio/morse";
+import { getLettersForLesson, generateWordForLesson } from "./LessonPlan";
 import ListeningTutorialView from "./view/ListeningTutorialView";
 import PhrasePracticeTutorialView from "./view/PhrasePracticeTutorialView";
 import BeginView from "./view/BeginView";
@@ -55,18 +54,18 @@ function generateLessonState(learningState: LearningState): LessonState {
 
 export default class Main extends React.Component<{}, MainState>
 {
-    state: MainState = {
-        appState: "unstarted",
-        learningState: {
-            currentLesson: 1
-        },
-    };
     // state: MainState = {
-    //     appState: "phrase_practice",
+    //     appState: "unstarted",
     //     learningState: {
-    //         currentLesson: 2
+    //         currentLesson: 1
     //     },
     // };
+    state: MainState = {
+        appState: "phrase_practice",
+        learningState: {
+            currentLesson: 2
+        },
+    };
 
     private audioContext: AudioContext;
     private scheduler: Scheduler;
@@ -105,7 +104,8 @@ export default class Main extends React.Component<{}, MainState>
             case "tutorial_listening":
                 return <ListeningTutorialView onBegin={this.handleBegin} />;
             case "introduce_listening":
-                return this.renderListeningPractice();
+                throw new Error("Listening practice is unimplemented");
+                // return this.renderListeningPractice();
             case "introduce_letter":
                 const availableLetters = getLettersForLesson(this.state.learningState.currentLesson);
                 const currentLetter = availableLetters[availableLetters.length - 1];
@@ -124,23 +124,6 @@ export default class Main extends React.Component<{}, MainState>
                     onSuccess={this.handleSuccess}
                     />;
         }
-    }
-
-    private renderListeningPractice() {
-        // TODO: this mode is not fully implemented.
-
-        const handleGuess = (complete_guess: string): boolean => {
-            return false;
-        };
-
-        return (
-            <MainView
-                statusMessage={"(type any letter when you hear a letter, and type a space when you hear a space)"}
-                currentGuess={""}
-                guessHistory={[]}
-                onGuess={handleGuess}
-                onStopRequest={this.handleStopRequest} />
-        );
     }
 
     private handleBegin = () => {
