@@ -12,15 +12,13 @@ export interface PhrasePracticeProperties {
 }
 
 interface PhrasePracticeState {
-    currentGuess: string[],
-    pendingGuess: string,
+    currentGuess: string,
 }
 
 export default class PhrasePractice extends React.Component<PhrasePracticeProperties, PhrasePracticeState>
 {
     state: PhrasePracticeState = {
-        currentGuess: [],
-        pendingGuess: ""
+        currentGuess: "",
     };
 
     constructor(props: PhrasePracticeProperties) {
@@ -33,17 +31,23 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
 
     componentDidUpdate(prevProps: PhrasePracticeProperties) {
         if (prevProps.phrase != this.props.phrase) {
-            this.props.onRequestRenderMorse(this.props.phrase.join(" "));
+            // this.props.onRequestRenderMorse(this.props.phrase.join(" "));
         }
     }
 
     render()
     {
         // Generate dash strings for remaining phrases:
+        const guesses = this.state.currentGuess.split(" ");
+        
+        // Don't print the one we are still typing:
+        guesses.pop();
+
+        console.log(guesses);
         const guessHistory = this.props.phrase.map((word, index): IGuess => {
             return {
-                guess: (this.state.currentGuess[index])
-                    ? this.state.currentGuess[index]
+                guess: (guesses[index])
+                    ? guesses[index]
                     : "_ _ _ _ _"
             };
         });
@@ -51,8 +55,8 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
         return (
             <section className="main">
                 <MainView
-                    statusMessage={"Type the phrases you hear."}
-                    currentGuess={this.state.pendingGuess}
+                    statusMessage={"Type the phrases you hear. Press space at the end of the word."}
+                    currentGuess={this.state.currentGuess}
                     guessHistory={guessHistory}
                     onGuess={this.handleGuess}
                     onStopRequest={this.handleStopRequest} />
@@ -63,23 +67,14 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
     private handleGuess = (complete_guess: string): boolean => {
         console.log(complete_guess);
 
-        const current_phrase_word_index = this.state.currentGuess.length;
-        const current_phrase_word = this.props.phrase[current_phrase_word_index];
+        const guesses = this.state.currentGuess.split(" ");
 
-        const current_phrase_word_length = current_phrase_word.length;
-
-        if (complete_guess.length === current_phrase_word_length) {
-            // Submit!
-            this.setState({
-                currentGuess: [
-                    ...this.state.currentGuess,
-                    complete_guess
-                ],
-                pendingGuess: ""
-            });
+        if (guesses.length > this.props.phrase.length) {
+            // We have completed this phrase. Ready to submit it for grading.
+            // TODO.
         } else {
             this.setState({
-                pendingGuess: complete_guess
+                currentGuess: complete_guess
             });
         }
 

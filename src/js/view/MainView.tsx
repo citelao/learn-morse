@@ -30,15 +30,9 @@ export default class MainView extends React.Component<MainViewProperties>
 
     render()
     {
-        const historyOffset = (this.props.guessHistory.length > 5)
-            ? this.props.guessHistory.length - 5
-            : 0;
-
-        const trimmedHistory = this.props.guessHistory.slice(historyOffset, this.props.guessHistory.length)
-
         const guessHistory = <ol>
-            {trimmedHistory.map((guess, index) => {
-                return <li key={index + historyOffset}>
+            {this.props.guessHistory.map((guess, index) => {
+                return <li key={index}>
                     {guess.guess}
                 </li>;
             })}
