@@ -6,8 +6,16 @@ export interface PhrasePracticeTutorialViewProperties {
 
 export default class PhrasePracticeTutorialView extends React.Component<PhrasePracticeTutorialViewProperties>
 {
+    private buttonRef: React.RefObject<HTMLButtonElement>;
+
     constructor(props: PhrasePracticeTutorialViewProperties) {
         super(props);
+
+        this.buttonRef = React.createRef<HTMLButtonElement>();
+    }
+
+    componentDidMount() {
+        this.buttonRef.current?.focus();
     }
 
     render()
@@ -29,7 +37,10 @@ export default class PhrasePracticeTutorialView extends React.Component<PhrasePr
                 <p>
                     When you have typed all five words, you'll see how you did.
                 </p>
-                <button onClick={this.handleBegin} className="startButton">Get started!</button>
+                <button
+                    onClick={this.handleBegin}
+                    ref={this.buttonRef}
+                    className="startButton">Get started!</button>
             </section>
         );
     }

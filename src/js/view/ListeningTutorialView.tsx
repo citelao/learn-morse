@@ -6,8 +6,16 @@ export interface ListeningTutorialViewProperties {
 
 export default class ListeningTutorialView extends React.Component<ListeningTutorialViewProperties>
 {
+    private buttonRef: React.RefObject<HTMLButtonElement>;
+
     constructor(props: ListeningTutorialViewProperties) {
         super(props);
+
+        this.buttonRef = React.createRef<HTMLButtonElement>();
+    }
+
+    componentDidMount() {
+        this.buttonRef.current?.focus();
     }
 
     render()
@@ -30,7 +38,10 @@ export default class ListeningTutorialView extends React.Component<ListeningTuto
                 <p>
                     Once you get the flow, we will actually name some of the letters.
                 </p>
-                <button onClick={this.handleBegin} className="startButton">Get started!</button>
+                <button
+                    onClick={this.handleBegin}
+                    ref={this.buttonRef}
+                    className="startButton">Get started!</button>
             </section>
         );
     }
