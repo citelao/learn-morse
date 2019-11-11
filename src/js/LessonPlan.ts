@@ -34,12 +34,16 @@ export function getLettersForLesson(currentLesson: number): string[] {
     return availableLetters;
 }
 
-function generateWordForLesson(currentLesson: number): string {
+export function generateWordForLesson(currentLesson: number, options: {
+    length: number
+}
+= {
+    length: 5
+}): string {
     const availableLetters = getLettersForLesson(currentLesson);
 
-    const LENGTH = 5;
     let word = "";
-    for(let i = 0; i < LENGTH; i++) {
+    for(let i = 0; i < options.length; i++) {
         const randomIndex = Math.floor(Math.random() * (availableLetters.length));
         word += availableLetters[randomIndex];
     }

@@ -3,7 +3,7 @@ import React from "react";
 import Scheduler, { INote } from "./audio/Scheduler";
 import { generateMorseNotes, INTER_WORD_DURATION, getKochSpeeds } from "./audio/morse";
 import MainView from "./view/MainView";
-import LessonPlan, { QuizMode, IGuess, getLettersForLesson } from "./LessonPlan";
+import LessonPlan, { QuizMode, IGuess, getLettersForLesson, generateWordForLesson } from "./LessonPlan";
 import ListeningTutorialView from "./view/ListeningTutorialView";
 import PhrasePracticeTutorialView from "./view/PhrasePracticeTutorialView";
 import BeginView from "./view/BeginView";
@@ -49,13 +49,31 @@ interface LearningState {
     currentLesson: number,
 }
 
+interface LessonState {
+    currentPhrase: string[]
+}
+
 interface MainState {
     appState: AppState,
 
     learningState: LearningState,
+    lessonState?: LessonState,
 
     currentLesson: LessonPlan,
     cachedLessonState: ICachedLessonState | null
+}
+
+function generateLessonState(learningState: LearningState): LessonState {
+    const phrase: string[] = [];
+    const PHRASE_LENGTH = 6;
+    for (let index = 0; index < PHRASE_LENGTH; index++) {
+        phrase.push(generateWordForLesson(learningState.currentLesson));
+    }
+
+    console.log(`generateLessonState - phrase [${phrase}]`);
+    return {
+        currentPhrase: phrase
+    };
 }
 
 export default class Main extends React.Component<{}, MainState>
@@ -91,14 +109,20 @@ export default class Main extends React.Component<{}, MainState>
     }
 
     componentDidMount() {
+        if (this.state.appState === "phrase_practice") {
+            this.setState({
+                lessonState: generateLessonState(this.state.learningState)
+            });
+        }
     }
 
     componentDidUpdate(prevProps: {}, prevState: MainState) {
         if (this.state.appState != prevState.appState) {
-            // if (this.)
-            // if (this.state.appState === "introduce_listening") {
-            //     this.state.currentLesson.begin();
-            // }
+            if (this.state.appState === "phrase_practice") {
+                this.setState({
+                    lessonState: generateLessonState(this.state.learningState)
+                });
+            }
         }
 
         const nowCachedLessonState = this.state.cachedLessonState && !prevState.cachedLessonState;
@@ -128,23 +152,6 @@ export default class Main extends React.Component<{}, MainState>
         }
     }
 
-    private getStatusMessage(): string | null {
-        if (!this.state.cachedLessonState) {
-            return null;
-        }
-
-        switch(this.state.cachedLessonState.quizMode) {
-            case QuizMode.VisibleSingle:
-                // fallthrough
-            case QuizMode.InvisibleSingle:
-                return "(type the letter you hear; press space to repeat)";
-            case QuizMode.InvisibleWord:
-                return `(type the words you hear 1/N)`;
-            case QuizMode.InvisiblePhrase:
-                return "(translate several words as they come)";
-        }
-    }
-
     render()
     {
         switch (this.state.appState) {
@@ -166,7 +173,7 @@ export default class Main extends React.Component<{}, MainState>
                 return <PhrasePracticeTutorialView onBegin={this.handleBegin} />;
             case "phrase_practice":
                 return <PhrasePractice
-                    phrase={["kmmmkk", "mmkkm"]}
+                    phrase={this.state.lessonState?.currentPhrase || []}
                     onRequestRenderMorse={this.renderMorse}
                     onStopRequest={this.handleStopRequest}
                     onSuccess={this.handleSuccess}
