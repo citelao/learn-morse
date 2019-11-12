@@ -67,9 +67,13 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
     private handleGuess = (complete_guess: string): boolean => {
         console.log(complete_guess);
 
-        const guesses = this.state.currentGuess.split(" ");
+        const guesses = complete_guess.split(" ");
+        const lastChar = complete_guess[complete_guess.length - 1];
 
-        if (guesses.length > this.props.phrase.length) {
+        const isEnoughGuesses = (guesses.length > this.props.phrase.length);
+        const lastCharWasSpace = lastChar === " ";
+        const isFinished = (isEnoughGuesses && lastCharWasSpace);
+        if (isFinished) {
             // We have completed this phrase. Ready to submit it for grading.
             // There might be more cues to submit that reveal themselves with
             // user testing.
