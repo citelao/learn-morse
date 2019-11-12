@@ -1,6 +1,7 @@
 import React from "react";
 import MainView from "./view/MainView";
 import { IGuess } from "./LessonPlan";
+import levenshtein from "js-levenshtein";
 
 export interface PhrasePracticeProperties {
     phrase: string[],
@@ -79,13 +80,31 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
             // user testing.
             console.log(`Guesses & actual: \n[${guesses}]\n[${this.props.phrase}]`);
 
-            // TODO: this only measures 100% correctness.
-            // TODO: should use Levenshteim distance
-            const isCorrect = this.props.phrase.every((value, index) => {
-                return value === guesses[index];
+            // Koch had a metric of "90% accuracy," though it is not entirely
+            // clear what that denoted. To better handle accidental skipped
+            // characters, use the Levenshtein distance between our guesses and
+            // the ground truth.
+            //
+            // Try to respect the "90% accuracy" as "90% of the characters
+            // correct." That means, for each character, there should be at most
+            // 0.1 Levenshtein "errors."
+            const distance = this.props.phrase.map((value, index) => {
+                return levenshtein(guesses[index], value);
             });
+            console.log(`[${distance}]`);
 
-            if (isCorrect) {
+            const error = distance.reduce((runningTotalError, error) => {
+                return runningTotalError + error;
+            }, 0);
+            const totalCharacters = this.props.phrase.reduce<number>((runningTotalChars, word) => {
+                return runningTotalChars + word.length;
+            }, 0);
+            const errorPercentage = error / totalCharacters;
+            console.log(`Error: ${errorPercentage * 100}%`);
+            
+            const DESIRED_ACCURACY = 0.9;
+            if ((1 - errorPercentage) >= DESIRED_ACCURACY) {
+                // TODO: we should keep track of this accuracy for later.
                 this.props.onSuccess();
             } else {
                 // TODO: get a new phrase
