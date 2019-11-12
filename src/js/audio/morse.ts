@@ -111,7 +111,7 @@ export function generateMorseNotes(context: AudioContext, message: string, optio
     effectiveSpeed: number,
 } = {
     frequencyInHertz: 443,
-    codingSpeed: 20,
+    codingSpeed: 16,
     effectiveSpeed: 12,
 }): INote[] {
     const speeds = getKochSpeeds(options.codingSpeed, options.effectiveSpeed);
@@ -155,7 +155,7 @@ export function generateMorseNotes(context: AudioContext, message: string, optio
 
                 const frequency = ((symbol: MorseSymbol): number => {
                     // TODO: investigate this; it teaches better!
-                    const SHOULD_SEPARATE_PITCHES = true;
+                    const SHOULD_SEPARATE_PITCHES = false;
                     
                     if (SHOULD_SEPARATE_PITCHES) {
                         switch(symbol) {

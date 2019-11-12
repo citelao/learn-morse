@@ -54,18 +54,18 @@ function generateLessonState(learningState: LearningState): LessonState {
 
 export default class Main extends React.Component<{}, MainState>
 {
-    // state: MainState = {
-    //     appState: "unstarted",
-    //     learningState: {
-    //         currentLesson: 1
-    //     },
-    // };
     state: MainState = {
-        appState: "phrase_practice",
+        appState: "unstarted",
         learningState: {
-            currentLesson: 2
+            currentLesson: 1
         },
     };
+    // state: MainState = {
+    //     appState: "phrase_practice",
+    //     learningState: {
+    //         currentLesson: 2
+    //     },
+    // };
 
     private audioContext: AudioContext;
     private scheduler: Scheduler;
