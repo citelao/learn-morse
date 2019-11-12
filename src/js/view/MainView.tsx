@@ -30,7 +30,7 @@ export default class MainView extends React.Component<MainViewProperties>
 
     render()
     {
-        const guessHistory = <ol class="guesses">
+        const guessHistory = <ol className="guesses">
             {this.props.guessHistory.map((guess, index) => {
                 return <li key={index}>
                     {guess.guess}
