@@ -47,7 +47,7 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
         const guessHistory = this.props.phrase.map((word, index): IGuess => {
             return {
                 guess: (guesses[index])
-                    ? guesses[index]
+                    ? guesses[index].split("").join(" ")
                     : "_ _ _ _ _"
             };
         });
@@ -74,7 +74,9 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
             // There might be more cues to submit that reveal themselves with
             // user testing.
             console.log(`Guesses & actual: \n[${guesses}]\n[${this.props.phrase}]`);
-            
+
+            // TODO: this only measures 100% correctness.
+            // TODO: should use Levenshteim distance
             const isCorrect = this.props.phrase.every((value, index) => {
                 return value === guesses[index];
             });
