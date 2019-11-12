@@ -170,6 +170,13 @@ export default class Main extends React.Component<{}, MainState>
                     appState: "phrase_practice"
                 });
             }
+        } else if (this.state.appState === "phrase_practice") {
+            this.setState({
+                appState: "introduce_letter",
+                learningState: {
+                    currentLesson: this.state.learningState.currentLesson + 1
+                }
+            });
         } else {
             throw new Error("Unexpected call to `handleSuccess`");
         }

@@ -31,7 +31,7 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
 
     componentDidUpdate(prevProps: PhrasePracticeProperties) {
         if (prevProps.phrase != this.props.phrase) {
-            // this.props.onRequestRenderMorse(this.props.phrase.join(" "));
+            this.props.onRequestRenderMorse(this.props.phrase.join(" "));
         }
     }
 
@@ -71,7 +71,19 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
 
         if (guesses.length > this.props.phrase.length) {
             // We have completed this phrase. Ready to submit it for grading.
-            // TODO.
+            // There might be more cues to submit that reveal themselves with
+            // user testing.
+            console.log(`Guesses & actual: \n[${guesses}]\n[${this.props.phrase}]`);
+            
+            const isCorrect = this.props.phrase.every((value, index) => {
+                return value === guesses[index];
+            });
+
+            if (isCorrect) {
+                this.props.onSuccess();
+            } else {
+                // TODO: get a new phrase
+            }
         } else {
             this.setState({
                 currentGuess: complete_guess
