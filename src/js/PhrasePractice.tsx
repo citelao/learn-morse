@@ -10,6 +10,7 @@ export interface PhrasePracticeProperties {
     onStopRequest: () => void,
 
     onSuccess: () => void,
+    onFailure: (errorPercentage: number) => void,
 }
 
 interface PhrasePracticeState {
@@ -33,6 +34,9 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
     componentDidUpdate(prevProps: PhrasePracticeProperties) {
         if (prevProps.phrase != this.props.phrase) {
             this.props.onRequestRenderMorse(this.props.phrase.join(" "));
+            this.setState({
+                currentGuess: ""
+            });
         }
     }
 
@@ -107,8 +111,9 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
                 // TODO: we should keep track of this accuracy for later.
                 this.props.onSuccess();
             } else {
-                // TODO: get a new phrase
+                this.props.onFailure(errorPercentage);
             }
+
         } else {
             this.setState({
                 currentGuess: complete_guess

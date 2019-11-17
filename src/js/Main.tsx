@@ -122,6 +122,7 @@ export default class Main extends React.Component<{}, MainState>
                     onRequestRenderMorse={this.renderMorse}
                     onStopRequest={this.handleStopRequest}
                     onSuccess={this.handleSuccess}
+                    onFailure={this.handleFailure}
                     />;
         }
     }
@@ -180,6 +181,13 @@ export default class Main extends React.Component<{}, MainState>
         } else {
             throw new Error("Unexpected call to `handleSuccess`");
         }
+    }
+
+    private handleFailure = (errorPercentage: number) => {
+        // new phrase
+        this.setState({
+            lessonState: generateLessonState(this.state.learningState)
+        });
     }
 
     private renderMorse = (phrase: string) => {
