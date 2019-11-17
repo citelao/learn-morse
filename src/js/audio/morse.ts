@@ -19,11 +19,49 @@ function parseMorseSymbols(symbols: string): MorseSymbol[] {
 }
 
 function getMorseForCharacter(char: string): MorseSymbol[] {
+    // Order adapted from https://lcwo.net/morsemachine. Thanks!
     const MORSE_ALPHABET: { [key: string]: string } = {
         k: "-.-",
         m: "--",
         u: "..-",
-        " ": " "
+        r: ".-.",
+        e: ".",
+        s: "...",
+        n: "-.",
+        a: ".-",
+        p: ".--.",
+        t: "-",
+        l: ".-..",
+        w: ".--",
+        i: "..",
+        ".": ".-.-.-",
+        j: ".---",
+        z: "--..",
+        "=": "-...-",
+        f: "..-.",
+        o: "---",
+        y: "-.--",
+        ",": "--..--",
+        v: "...-",
+        g: "--.",
+        5: ".....",
+        "/": "-..-.",
+        q: "--.-",
+        9: "----.",
+        2: "..---",
+        h: "....",
+        3: "...--",
+        8: "---..",
+        b: "-...",
+        "?": "..--..",
+        4: "....-",
+        7: "--...",
+        c: "-.-.",
+        1: ".----",
+        d: "-..",
+        6: "-....",
+        0: "-----",
+        x: "-..-",
     };
 
     if (char.length > 1) {
