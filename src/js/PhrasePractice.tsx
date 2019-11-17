@@ -199,8 +199,7 @@ export default class PhrasePractice extends React.Component<
 
         const DESIRED_ACCURACY = 0.9;
         if (accuracy >= DESIRED_ACCURACY) {
-            // TODO: we should keep track of this accuracy for later.
-            this.props.onSuccess();
+            this.props.onSuccess(accuracy);
         } else {
             this.props.onFailure(accuracy);
         }
