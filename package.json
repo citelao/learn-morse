@@ -5,7 +5,10 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "watch": "parcel src/index.html"
+        "watch": "parcel src/index.html",
+        "release:build": "parcel build src/index.html --public-url /learn-morse/",
+        "release:deploy": "$(npm bin)/gh-pages -d dist/",
+        "release": "npm run release:build && npm run release:deploy"
     },
     "keywords": [],
     "author": "",
@@ -18,12 +21,15 @@
         "@typescript-eslint/parser": "^2.7.0",
         "babel-core": "^6.26.3",
         "babel-preset-env": "^1.7.0",
+        "cssnano": "^4.1.10",
         "eslint": "^6.6.0",
         "eslint-config-prettier": "^6.6.0",
         "eslint-plugin-prettier": "^3.1.1",
         "eslint-plugin-react": "^7.16.0",
+        "gh-pages": "^2.1.1",
         "husky": "^3.0.9",
         "lint-staged": "^9.4.3",
+        "parcel-plugin-clean-dist": "0.0.6",
         "prettier": "^1.19.1",
         "sass": "^1.23.3",
         "typescript": "^3.7.2"
