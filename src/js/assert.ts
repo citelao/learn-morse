@@ -1,5 +1,8 @@
-export default function assert(condition: unknown): asserts condition {
+export default function assert(condition: unknown, message?: string): asserts condition {
     if (!condition) {
-        throw new Error(`Assertion failed: ${condition}`);
+        const message_string = (message)
+            ? ` (${message})`
+            : "";
+        throw new Error(`Assertion failed: ${condition}${message_string}`);
     }
 }

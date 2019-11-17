@@ -2,7 +2,6 @@ import React from "react";
 import MainView from "./view/MainView";
 import { IGuess } from "./LessonPlan";
 import levenshtein from "js-levenshtein";
-import PhrasePracticeReviewView from "./view/PhrasePractiveReviewView";
 
 export interface PhrasePracticeProperties {
     phrase: string[];
@@ -10,8 +9,8 @@ export interface PhrasePracticeProperties {
     onRequestRenderMorse: (phrase: string) => void;
     onStopRequest: () => void;
 
-    onSuccess: () => void;
-    onFailure: (errorPercentage: number) => void;
+    onSuccess: (accuracy: number) => void;
+    onFailure: (accuracy: number) => void;
 }
 
 interface PhrasePracticeState {
@@ -195,16 +194,15 @@ export default class PhrasePractice extends React.Component<
     };
 
     private handleContinue = () => {
-        // TODO
-        const grade = gradeGuess(this.props.phrase, this.state.currentGuess.split(" "));
-        console.log(`Accuracy: ${grade * 100}%`);
+        const accuracy = gradeGuess(this.props.phrase, this.state.currentGuess.split(" "));
+        console.log(`Accuracy: ${accuracy * 100}%`);
 
         const DESIRED_ACCURACY = 0.9;
-        if (grade >= DESIRED_ACCURACY) {
+        if (accuracy >= DESIRED_ACCURACY) {
             // TODO: we should keep track of this accuracy for later.
             this.props.onSuccess();
         } else {
-            this.props.onFailure(1 - grade);
+            this.props.onFailure(accuracy);
         }
     }
 }

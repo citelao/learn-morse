@@ -24,9 +24,14 @@ type AppState =
 
 const ENABLE_LISTENING_PRACTICE = false;
 
-// Replaces `lessonPlan`.
+interface LessonResult {
+    lesson: number;
+    accuracy: number;
+}
+
 interface LearningState {
     currentLesson: number;
+    history: LessonResult[];
 }
 
 interface LessonState {
@@ -57,7 +62,8 @@ export default class Main extends React.Component<{}, MainState> {
     state: MainState = {
         appState: "unstarted",
         learningState: {
-            currentLesson: 1
+            currentLesson: 1,
+            history: []
         }
     };
     // state: MainState = {
@@ -167,14 +173,15 @@ export default class Main extends React.Component<{}, MainState> {
         }
     };
 
-    private handleSuccess = () => {
+    private handleSuccess = (accuracy?: number) => {
         if (this.state.appState === "introduce_letter") {
             // Special case learning the first letters:
             if (this.state.learningState.currentLesson === 1) {
                 this.setState({
                     learningState: {
                         currentLesson:
-                            this.state.learningState.currentLesson + 1
+                            this.state.learningState.currentLesson + 1,
+                        history: this.state.learningState.history
                     }
                 });
             } else if (this.state.learningState.currentLesson === 2) {
@@ -187,10 +194,16 @@ export default class Main extends React.Component<{}, MainState> {
                 });
             }
         } else if (this.state.appState === "phrase_practice") {
+            assert(accuracy !== undefined, "Must have accuracy.");
+
             this.setState({
                 appState: "introduce_letter",
                 learningState: {
-                    currentLesson: this.state.learningState.currentLesson + 1
+                    currentLesson: this.state.learningState.currentLesson + 1,
+                    history: [...this.state.learningState.history, {
+                        accuracy: accuracy,
+                        lesson: this.state.learningState.currentLesson
+                    }]
                 }
             });
         } else {
@@ -198,11 +211,18 @@ export default class Main extends React.Component<{}, MainState> {
         }
     };
 
-    private handleFailure = (errorPercentage: number) => {
+    private handleFailure = (accuracy: number) => {
         assert(this.state.appState === "phrase_practice");
 
-        // new phrase
+        // Get a new phrase and save the lesson state.
         this.setState({
+            learningState: {
+                currentLesson: this.state.learningState.currentLesson,
+                history: [...this.state.learningState.history, {
+                    accuracy: accuracy,
+                    lesson: this.state.learningState.currentLesson
+                }]
+            },
             lessonState: generateLessonState(this.state.learningState)
         });
     };
