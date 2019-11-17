@@ -8,6 +8,7 @@ import PhrasePracticeTutorialView from "./view/PhrasePracticeTutorialView";
 import BeginView from "./view/BeginView";
 import IntroduceLetter from "./IntroduceLetter";
 import PhrasePractice from "./PhrasePractice";
+import assert from "./assert";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -184,6 +185,8 @@ export default class Main extends React.Component<{}, MainState>
     }
 
     private handleFailure = (errorPercentage: number) => {
+        assert(this.state.appState === "phrase_practice");
+
         // new phrase
         this.setState({
             lessonState: generateLessonState(this.state.learningState)
