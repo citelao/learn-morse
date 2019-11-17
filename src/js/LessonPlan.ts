@@ -2,7 +2,7 @@ export enum QuizMode {
     VisibleSingle = 1,
     InvisibleSingle = 2,
     InvisibleWord = 3,
-    InvisiblePhrase = 4,
+    InvisiblePhrase = 4
 }
 
 export interface IGuess {
@@ -11,53 +11,50 @@ export interface IGuess {
 
 /** LessonPlan is designed to be trivially serializable to JSON. */
 export interface ILessonPlanState {
-    currentLesson: number,
+    currentLesson: number;
 
-    quizMode: QuizMode,
+    quizMode: QuizMode;
 
-    currentWord: string | null,
-    currentPhrase: string[] | null,
-    wordId: number | null,
-    currentGuess: string,
+    currentWord: string | null;
+    currentPhrase: string[] | null;
+    wordId: number | null;
+    currentGuess: string;
 
-    guessHistory: IGuess[],
+    guessHistory: IGuess[];
 }
 
-const LETTER_SERIES = [
-    "k",
-    "m",
-    "u"
-];
+const LETTER_SERIES = ["k", "m", "u"];
 
 export function getLettersForLesson(currentLesson: number): string[] {
     const availableLetters = LETTER_SERIES.slice(0, currentLesson);
     return availableLetters;
 }
 
-export function generateWordForLesson(currentLesson: number, options: {
-    length: number
-}
-= {
-    length: 5
-}): string {
+export function generateWordForLesson(
+    currentLesson: number,
+    options: {
+        length: number;
+    } = {
+        length: 5
+    }
+): string {
     const availableLetters = getLettersForLesson(currentLesson);
 
     let word = "";
-    for(let i = 0; i < options.length; i++) {
-        const randomIndex = Math.floor(Math.random() * (availableLetters.length));
+    for (let i = 0; i < options.length; i++) {
+        const randomIndex = Math.floor(Math.random() * availableLetters.length);
         word += availableLetters[randomIndex];
     }
 
     return word;
 }
 
-function getNewWord(args: {
-    quizMode: QuizMode,
-    currentLesson: number
-}) {
-    const word = (args.quizMode === QuizMode.VisibleSingle || args.quizMode === QuizMode.InvisibleSingle)
-        ? LETTER_SERIES[args.currentLesson - 1]
-        : generateWordForLesson(args.currentLesson);
+function getNewWord(args: { quizMode: QuizMode; currentLesson: number }) {
+    const word =
+        args.quizMode === QuizMode.VisibleSingle ||
+        args.quizMode === QuizMode.InvisibleSingle
+            ? LETTER_SERIES[args.currentLesson - 1]
+            : generateWordForLesson(args.currentLesson);
 
     return word;
 }
@@ -67,9 +64,12 @@ interface IAction {
     begin?: boolean;
 }
 
-function getNextStatePartial(currentState: ILessonPlanState, action: IAction): Partial<ILessonPlanState> {    
+function getNextStatePartial(
+    currentState: ILessonPlanState,
+    action: IAction
+): Partial<ILessonPlanState> {
     if (action.begin) {
-        switch(currentState.quizMode) {
+        switch (currentState.quizMode) {
             case QuizMode.VisibleSingle:
             case QuizMode.InvisibleSingle:
             case QuizMode.InvisibleWord: {
@@ -81,7 +81,7 @@ function getNextStatePartial(currentState: ILessonPlanState, action: IAction): P
                 return {
                     currentWord: newWord,
                     wordId: (currentState.wordId || 0) + 1,
-                    currentGuess: "",
+                    currentGuess: ""
                 };
             }
             case QuizMode.InvisiblePhrase: {
@@ -89,25 +89,28 @@ function getNextStatePartial(currentState: ILessonPlanState, action: IAction): P
                 const phrase: string[] = [];
                 const PHRASE_LENGTH = 6;
                 for (let index = 0; index < PHRASE_LENGTH; index++) {
-                    phrase.push(getNewWord({
-                        currentLesson: currentState.currentLesson,
-                        quizMode: currentState.quizMode
-                    }));
+                    phrase.push(
+                        getNewWord({
+                            currentLesson: currentState.currentLesson,
+                            quizMode: currentState.quizMode
+                        })
+                    );
                 }
 
                 return {
                     currentWord: phrase[0],
                     wordId: (currentState.wordId || 0) + 1,
                     currentPhrase: phrase,
-                    currentGuess: "",
+                    currentGuess: ""
                 };
             }
         }
     } else if (action.newGuess) {
-        const isFullGuess = action.newGuess.length === currentState.currentWord?.length;
+        const isFullGuess =
+            action.newGuess.length === currentState.currentWord?.length;
         if (isFullGuess) {
             const isCorrect = action.newGuess == currentState.currentWord;
-            switch(currentState.quizMode) {
+            switch (currentState.quizMode) {
                 case QuizMode.VisibleSingle:
                 case QuizMode.InvisibleSingle:
                 case QuizMode.InvisibleWord:
@@ -115,12 +118,13 @@ function getNextStatePartial(currentState: ILessonPlanState, action: IAction): P
                         let partial: Partial<ILessonPlanState> = {};
 
                         // Update quiz mode & lesson number as necessary
-                        switch(currentState.quizMode) {
+                        switch (currentState.quizMode) {
                             case QuizMode.VisibleSingle:
                                 // The first lesson is special-cased to introduce
                                 // the next letter immediately.
                                 if (currentState.currentLesson === 1) {
-                                    partial.currentLesson = currentState.currentLesson + 1;
+                                    partial.currentLesson =
+                                        currentState.currentLesson + 1;
                                 } else {
                                     partial.quizMode = QuizMode.InvisibleSingle;
                                 }
@@ -130,12 +134,14 @@ function getNextStatePartial(currentState: ILessonPlanState, action: IAction): P
                                 break;
                             case QuizMode.InvisibleWord:
                             default:
-                                // no-op
+                            // no-op
                         }
 
                         // Generate a new word.
                         const newWord = getNewWord({
-                            currentLesson: partial.currentLesson || currentState.currentLesson,
+                            currentLesson:
+                                partial.currentLesson ||
+                                currentState.currentLesson,
                             quizMode: partial.quizMode || currentState.quizMode
                         });
 
@@ -184,7 +190,10 @@ function getNextStatePartial(currentState: ILessonPlanState, action: IAction): P
     return {};
 }
 
-function getNextState(currentState: ILessonPlanState, action: IAction): ILessonPlanState {
+function getNextState(
+    currentState: ILessonPlanState,
+    action: IAction
+): ILessonPlanState {
     const updates = getNextStatePartial(currentState, action);
     const newState = Object.assign({}, currentState, updates);
     console.log(newState);
@@ -216,7 +225,7 @@ export default class LessonPlan {
             wordId: null,
             currentPhrase: null,
             currentGuess: "",
-            guessHistory: [],
+            guessHistory: []
         });
     }
 
@@ -230,7 +239,7 @@ export default class LessonPlan {
     }
 
     public getWordId(): number | null {
-        return this.state.wordId
+        return this.state.wordId;
     }
 
     public getCurrentPhrase(): string[] | null {
@@ -254,7 +263,7 @@ export default class LessonPlan {
     }
 
     public begin() {
-        this.state = getNextState(this.state, { begin: true});
+        this.state = getNextState(this.state, { begin: true });
         this.updateListeners();
     }
 
@@ -264,8 +273,8 @@ export default class LessonPlan {
     }
 
     private updateListeners() {
-        this.listeners.forEach((listener) => {
+        this.listeners.forEach(listener => {
             listener();
-        })
+        });
     }
 }

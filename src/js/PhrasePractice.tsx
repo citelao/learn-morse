@@ -4,23 +4,25 @@ import { IGuess } from "./LessonPlan";
 import levenshtein from "js-levenshtein";
 
 export interface PhrasePracticeProperties {
-    phrase: string[],
-    
-    onRequestRenderMorse: (phrase: string) => void,
-    onStopRequest: () => void,
+    phrase: string[];
 
-    onSuccess: () => void,
-    onFailure: (errorPercentage: number) => void,
+    onRequestRenderMorse: (phrase: string) => void;
+    onStopRequest: () => void;
+
+    onSuccess: () => void;
+    onFailure: (errorPercentage: number) => void;
 }
 
 interface PhrasePracticeState {
-    currentGuess: string,
+    currentGuess: string;
 }
 
-export default class PhrasePractice extends React.Component<PhrasePracticeProperties, PhrasePracticeState>
-{
+export default class PhrasePractice extends React.Component<
+    PhrasePracticeProperties,
+    PhrasePracticeState
+> {
     state: PhrasePracticeState = {
-        currentGuess: "",
+        currentGuess: ""
     };
 
     constructor(props: PhrasePracticeProperties) {
@@ -40,31 +42,35 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
         }
     }
 
-    render()
-    {
+    render() {
         // Generate dash strings for remaining phrases:
         const guesses = this.state.currentGuess.split(" ");
-        
+
         // Don't print the one we are still typing:
         guesses.pop();
 
         console.log(guesses);
-        const guessHistory = this.props.phrase.map((word, index): IGuess => {
-            return {
-                guess: (guesses[index])
-                    ? guesses[index].split("").join(" ")
-                    : "_ _ _ _ _"
-            };
-        });
+        const guessHistory = this.props.phrase.map(
+            (word, index): IGuess => {
+                return {
+                    guess: guesses[index]
+                        ? guesses[index].split("").join(" ")
+                        : "_ _ _ _ _"
+                };
+            }
+        );
 
         return (
             <section className="main">
                 <MainView
-                    statusMessage={"Type the phrases you hear. Press space at the end of the word."}
+                    statusMessage={
+                        "Type the phrases you hear. Press space at the end of the word."
+                    }
                     currentGuess={this.state.currentGuess}
                     guessHistory={guessHistory}
                     onGuess={this.handleGuess}
-                    onStopRequest={this.handleStopRequest} />
+                    onStopRequest={this.handleStopRequest}
+                />
             </section>
         );
     }
@@ -75,14 +81,16 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
         const guesses = complete_guess.split(" ");
         const lastChar = complete_guess[complete_guess.length - 1];
 
-        const isEnoughGuesses = (guesses.length > this.props.phrase.length);
+        const isEnoughGuesses = guesses.length > this.props.phrase.length;
         const lastCharWasSpace = lastChar === " ";
-        const isFinished = (isEnoughGuesses && lastCharWasSpace);
+        const isFinished = isEnoughGuesses && lastCharWasSpace;
         if (isFinished) {
             // We have completed this phrase. Ready to submit it for grading.
             // There might be more cues to submit that reveal themselves with
             // user testing.
-            console.log(`Guesses & actual: \n[${guesses}]\n[${this.props.phrase}]`);
+            console.log(
+                `Guesses & actual: \n[${guesses}]\n[${this.props.phrase}]`
+            );
 
             // Koch had a metric of "90% accuracy," though it is not entirely
             // clear what that denoted. To better handle accidental skipped
@@ -100,20 +108,22 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
             const error = distance.reduce((runningTotalError, error) => {
                 return runningTotalError + error;
             }, 0);
-            const totalCharacters = this.props.phrase.reduce<number>((runningTotalChars, word) => {
-                return runningTotalChars + word.length;
-            }, 0);
+            const totalCharacters = this.props.phrase.reduce<number>(
+                (runningTotalChars, word) => {
+                    return runningTotalChars + word.length;
+                },
+                0
+            );
             const errorPercentage = error / totalCharacters;
             console.log(`Error: ${errorPercentage * 100}%`);
-            
+
             const DESIRED_ACCURACY = 0.9;
-            if ((1 - errorPercentage) >= DESIRED_ACCURACY) {
+            if (1 - errorPercentage >= DESIRED_ACCURACY) {
                 // TODO: we should keep track of this accuracy for later.
                 this.props.onSuccess();
             } else {
                 this.props.onFailure(errorPercentage);
             }
-
         } else {
             this.setState({
                 currentGuess: complete_guess
@@ -121,9 +131,9 @@ export default class PhrasePractice extends React.Component<PhrasePracticeProper
         }
 
         return true;
-    }
+    };
 
     private handleStopRequest = () => {
         this.props.onStopRequest();
-    }
+    };
 }

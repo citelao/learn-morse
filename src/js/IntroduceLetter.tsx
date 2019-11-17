@@ -2,21 +2,21 @@ import React from "react";
 import MainView from "./view/MainView";
 
 export interface IntroduceLetterProperties {
-    letter: string,
-    
-    onRequestRenderMorse: (phrase: string) => void,
-    onStopRequest: () => void,
+    letter: string;
 
-    onSuccess: () => void,
+    onRequestRenderMorse: (phrase: string) => void;
+    onStopRequest: () => void;
+
+    onSuccess: () => void;
 }
 
-interface IntroduceLetterState {
-}
+interface IntroduceLetterState {}
 
-export default class IntroduceLetter extends React.Component<IntroduceLetterProperties, IntroduceLetterState>
-{
-    state: IntroduceLetterState = {
-    };
+export default class IntroduceLetter extends React.Component<
+    IntroduceLetterProperties,
+    IntroduceLetterState
+> {
+    state: IntroduceLetterState = {};
 
     constructor(props: IntroduceLetterProperties) {
         super(props);
@@ -32,17 +32,19 @@ export default class IntroduceLetter extends React.Component<IntroduceLetterProp
         }
     }
 
-    render()
-    {
+    render() {
         return (
             <section className="main">
                 <MainView
                     letter={this.props.letter}
-                    statusMessage={"Type the letter you hear. Press space to repeat."}
+                    statusMessage={
+                        "Type the letter you hear. Press space to repeat."
+                    }
                     currentGuess={""}
                     guessHistory={[]}
                     onGuess={this.handleGuess}
-                    onStopRequest={this.handleStopRequest} />
+                    onStopRequest={this.handleStopRequest}
+                />
             </section>
         );
     }
@@ -60,9 +62,9 @@ export default class IntroduceLetter extends React.Component<IntroduceLetterProp
 
         // TODO: unnecessary.
         return true;
-    }
+    };
 
     private handleStopRequest = () => {
         this.props.onStopRequest();
-    }
+    };
 }

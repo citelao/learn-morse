@@ -1,50 +1,52 @@
 {
-  "name": "morse",
-  "version": "1.0.0",
-  "description": "## Development",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "parcel src/index.html"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/js-levenshtein": "^1.1.0",
-    "@types/react": "^16.9.11",
-    "@types/react-dom": "^16.9.4",
-    "@typescript-eslint/eslint-plugin": "^2.7.0",
-    "@typescript-eslint/parser": "^2.7.0",
-    "babel-core": "^6.26.3",
-    "babel-preset-env": "^1.7.0",
-    "eslint": "^6.6.0",
-    "eslint-plugin-react": "^7.16.0",
-    "husky": "^3.0.9",
-    "lint-staged": "^9.4.3",
-    "prettier": "^1.19.1",
-    "sass": "^1.23.3",
-    "typescript": "^3.7.2"
-  },
-  "dependencies": {
-    "app": "^0.1.0",
-    "js-levenshtein": "^1.1.6",
-    "react": "^16.11.0",
-    "react-dom": "^16.11.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
+    "name": "morse",
+    "version": "1.0.0",
+    "description": "## Development",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "watch": "parcel src/index.html"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/js-levenshtein": "^1.1.0",
+        "@types/react": "^16.9.11",
+        "@types/react-dom": "^16.9.4",
+        "@typescript-eslint/eslint-plugin": "^2.7.0",
+        "@typescript-eslint/parser": "^2.7.0",
+        "babel-core": "^6.26.3",
+        "babel-preset-env": "^1.7.0",
+        "eslint": "^6.6.0",
+        "eslint-config-prettier": "^6.6.0",
+        "eslint-plugin-prettier": "^3.1.1",
+        "eslint-plugin-react": "^7.16.0",
+        "husky": "^3.0.9",
+        "lint-staged": "^9.4.3",
+        "prettier": "^1.19.1",
+        "sass": "^1.23.3",
+        "typescript": "^3.7.2"
+    },
+    "dependencies": {
+        "app": "^0.1.0",
+        "js-levenshtein": "^1.1.6",
+        "react": "^16.11.0",
+        "react-dom": "^16.11.0"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.{js,css,json,md}": [
+            "prettier --write",
+            "git add"
+        ],
+        "*.js": [
+            "eslint --fix",
+            "git add"
+        ]
     }
-  },
-  "lint-staged": {
-    "*.{js,css,json,md}": [
-      "prettier --write",
-      "git add"
-    ],
-    "*.js": [
-      "eslint --fix",
-      "git add"
-    ]
-  }
 }

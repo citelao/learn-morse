@@ -3,27 +3,27 @@ import { generateSineNote } from "./sine";
 
 type MorseSymbol = "-" | ".";
 function isMorseSymbol(char: string): char is MorseSymbol {
-    return (char === "-" || char === ".");
+    return char === "-" || char === ".";
 }
 
 function parseMorseSymbols(symbols: string): MorseSymbol[] {
     const chars = symbols.split("");
-    
+
     // Validate the string:
     const isValid = chars.every(isMorseSymbol);
     if (!isValid) {
         throw new Error(`Invalid morse symbols in '${symbols}'`);
     }
 
-    return (chars as MorseSymbol[]);
+    return chars as MorseSymbol[];
 }
 
 function getMorseForCharacter(char: string): MorseSymbol[] {
     const MORSE_ALPHABET: { [key: string]: string } = {
-        "k": "-.-",
-        "m": "--",
-        "u": "..-",
-        " ": " ",
+        k: "-.-",
+        m: "--",
+        u: "..-",
+        " ": " "
     };
 
     if (char.length > 1) {
@@ -83,12 +83,18 @@ export function getSpeeds(wordsPerMinute: number): ISpeeds {
     return speeds;
 }
 
-export function getKochSpeeds(codingWordsPerMinute: number, effectiveWordsPerMinute: number): ISpeeds {
+export function getKochSpeeds(
+    codingWordsPerMinute: number,
+    effectiveWordsPerMinute: number
+): ISpeeds {
     const codingSpeeds = getSpeeds(codingWordsPerMinute);
-    
+
     // PARIS has 43units + 7 space units.
     const unitsPerWord = 43;
-    const codingTimePerMinute = effectiveWordsPerMinute * unitsPerWord * codingSpeeds.dit_duration_seconds;
+    const codingTimePerMinute =
+        effectiveWordsPerMinute *
+        unitsPerWord *
+        codingSpeeds.dit_duration_seconds;
 
     const secondsPerMinute = 60;
     const freeTimePerMinute = secondsPerMinute - codingTimePerMinute;
@@ -97,55 +103,70 @@ export function getKochSpeeds(codingWordsPerMinute: number, effectiveWordsPerMin
     const speeds: ISpeeds = {
         dit_duration_seconds: codingSpeeds.dit_duration_seconds,
         dart_duration_seconds: codingSpeeds.dart_duration_seconds,
-        inter_symbol_duration_seconds: codingSpeeds.inter_symbol_duration_seconds,
-        inter_character_duration_seconds: codingSpeeds.inter_character_duration_seconds,
+        inter_symbol_duration_seconds:
+            codingSpeeds.inter_symbol_duration_seconds,
+        inter_character_duration_seconds:
+            codingSpeeds.inter_character_duration_seconds,
         inter_word_duration_seconds: inter_word_duration
     };
     console.log(speeds);
     return speeds;
 }
 
-export function generateMorseNotes(context: AudioContext, message: string, options: {
-    frequencyInHertz: number,
-    codingSpeed: number,
-    effectiveSpeed: number,
-} = {
-    frequencyInHertz: 443,
-    codingSpeed: 16,
-    effectiveSpeed: 12,
-}): INote[] {
+export function generateMorseNotes(
+    context: AudioContext,
+    message: string,
+    options: {
+        frequencyInHertz: number;
+        codingSpeed: number;
+        effectiveSpeed: number;
+    } = {
+        frequencyInHertz: 443,
+        codingSpeed: 16,
+        effectiveSpeed: 12
+    }
+): INote[] {
     const speeds = getKochSpeeds(options.codingSpeed, options.effectiveSpeed);
     const words = message.split(" ");
     const notes = words.reduce<INote[]>((currentWordNotes, word) => {
-        const isFirstWord = (currentWordNotes.length === 0);
+        const isFirstWord = currentWordNotes.length === 0;
 
         const chars = word.split("");
         const notes = chars.reduce<INote[]>((currentMorseChars, char) => {
-            const isFirstCharacter = (currentMorseChars.length === 0);
+            const isFirstCharacter = currentMorseChars.length === 0;
 
             const symbols = getMorseForCharacter(char);
             const notes = symbols.reduce<INote[]>((currentPoints, symbol) => {
-                const isFirstPointInCharacter = (currentPoints.length === 0);
+                const isFirstPointInCharacter = currentPoints.length === 0;
                 let timeOffset = 0;
                 if (isFirstPointInCharacter) {
                     if (isFirstCharacter) {
                         if (isFirstWord) {
                             timeOffset = 0;
                         } else {
-                            const previousWordPoint = currentWordNotes[currentWordNotes.length - 1];
-                            timeOffset = previousWordPoint.timeFromNowInSeconds + speeds.inter_word_duration_seconds;
+                            const previousWordPoint =
+                                currentWordNotes[currentWordNotes.length - 1];
+                            timeOffset =
+                                previousWordPoint.timeFromNowInSeconds +
+                                speeds.inter_word_duration_seconds;
                         }
                     } else {
-                        const previousCharacterPoint = currentMorseChars[currentMorseChars.length - 1];
-                        timeOffset = previousCharacterPoint.timeFromNowInSeconds + speeds.inter_character_duration_seconds;
+                        const previousCharacterPoint =
+                            currentMorseChars[currentMorseChars.length - 1];
+                        timeOffset =
+                            previousCharacterPoint.timeFromNowInSeconds +
+                            speeds.inter_character_duration_seconds;
                     }
                 } else {
-                    const previousPoint = currentPoints[currentPoints.length - 1];
-                    timeOffset = previousPoint.timeFromNowInSeconds + speeds.inter_symbol_duration_seconds;
+                    const previousPoint =
+                        currentPoints[currentPoints.length - 1];
+                    timeOffset =
+                        previousPoint.timeFromNowInSeconds +
+                        speeds.inter_symbol_duration_seconds;
                 }
-                
+
                 const duration = ((symbol: MorseSymbol): number => {
-                    switch(symbol) {
+                    switch (symbol) {
                         case "-":
                             return speeds.dart_duration_seconds;
                         case ".":
@@ -156,9 +177,9 @@ export function generateMorseNotes(context: AudioContext, message: string, optio
                 const frequency = ((symbol: MorseSymbol): number => {
                     // TODO: investigate this; it teaches better!
                     const SHOULD_SEPARATE_PITCHES = false;
-                    
+
                     if (SHOULD_SEPARATE_PITCHES) {
-                        switch(symbol) {
+                        switch (symbol) {
                             case "-":
                                 return options.frequencyInHertz;
                             case ".":
@@ -168,30 +189,21 @@ export function generateMorseNotes(context: AudioContext, message: string, optio
                         return options.frequencyInHertz;
                     }
                 })(symbol);
-                
+
                 const note = generateSineNote({
-                    context: context, 
+                    context: context,
                     duration: duration,
                     frequencyInHertz: frequency,
                     timeFromNowInSeconds: timeOffset
                 });
-                return [
-                    ... currentPoints,
-                    ... note
-                ];
+                return [...currentPoints, ...note];
             }, []);
 
-            return [
-                ... currentMorseChars,
-                ... notes
-            ];
+            return [...currentMorseChars, ...notes];
         }, []);
 
-        return [
-            ... currentWordNotes,
-            ... notes
-        ];
+        return [...currentWordNotes, ...notes];
     }, []);
-    
+
     return notes;
 }

@@ -29,16 +29,21 @@ export default class Scheduler {
         setTimeout(this.handleAnimationFrame, 0);
     }
 
-    public scheduleNotes(notes: INote[], options?: { shouldSortNotes?: boolean}) {
+    public scheduleNotes(
+        notes: INote[],
+        options?: { shouldSortNotes?: boolean }
+    ) {
         const shouldSortNotes = (options && options.shouldSortNotes) || true;
         const currentTime = this.audioContext.currentTime;
 
         // TODO: does not handle existing notes
         if (shouldSortNotes) {
-            notes.sort((a, b) => a.timeFromNowInSeconds - b.timeFromNowInSeconds);
+            notes.sort(
+                (a, b) => a.timeFromNowInSeconds - b.timeFromNowInSeconds
+            );
         }
 
-        notes.forEach((note) => {
+        notes.forEach(note => {
             const scheduledNote: IQueuedNote = {
                 callback: note.callback,
                 cancellationCallback: note.cancellationCallback,
@@ -51,18 +56,21 @@ export default class Scheduler {
 
     public clear() {
         const frameTime = this.audioContext.currentTime;
-        this.queuedNotes.forEach((note) => {
-            if(note.cancellationCallback) {
+        this.queuedNotes.forEach(note => {
+            if (note.cancellationCallback) {
                 note.cancellationCallback(frameTime);
             }
-        })
+        });
         this.queuedNotes = [];
     }
 
     private handleAnimationFrame = () => {
         // See https://www.html5rocks.com/en/tutorials/audio/scheduling/
         const frameTime = this.audioContext.currentTime;
-        while (this.queuedNotes.length > 0 && this.queuedNotes[0].startTime < frameTime) {
+        while (
+            this.queuedNotes.length > 0 &&
+            this.queuedNotes[0].startTime < frameTime
+        ) {
             const playedNote = this.queuedNotes.splice(0, 1)[0];
             playedNote.callback(frameTime);
             // console.log(frameTime);
@@ -70,5 +78,5 @@ export default class Scheduler {
 
         // this.window.requestAnimationFrame(this.handleAnimationFrame);
         setTimeout(this.handleAnimationFrame, 0);
-    }
+    };
 }

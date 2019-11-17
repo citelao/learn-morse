@@ -3,17 +3,16 @@ import { IGuess } from "../LessonPlan";
 import LetterView from "./quiz_view/LetterView";
 
 export interface MainViewProperties {
-    letter?: string,
-    currentGuess: string,
-    guessHistory: IGuess[],
-    statusMessage: string | null,
+    letter?: string;
+    currentGuess: string;
+    guessHistory: IGuess[];
+    statusMessage: string | null;
 
-    onGuess: (char: string) => boolean,
-    onStopRequest: () => void,
+    onGuess: (char: string) => boolean;
+    onStopRequest: () => void;
 }
 
-export default class MainView extends React.Component<MainViewProperties>
-{
+export default class MainView extends React.Component<MainViewProperties> {
     private inputRef: React.RefObject<HTMLInputElement>;
 
     constructor(props: MainViewProperties) {
@@ -26,24 +25,21 @@ export default class MainView extends React.Component<MainViewProperties>
         this.inputRef.current?.focus();
     }
 
-    render()
-    {
-        const guessHistory = <ol className="guesses">
-            {this.props.guessHistory.map((guess, index) => {
-                return <li key={index}>
-                    {guess.guess}
-                </li>;
-            })}
-        </ol>;
+    render() {
+        const guessHistory = (
+            <ol className="guesses">
+                {this.props.guessHistory.map((guess, index) => {
+                    return <li key={index}>{guess.guess}</li>;
+                })}
+            </ol>
+        );
 
         return (
             <>
                 {guessHistory}
-                {
-                    (this.props.letter) 
-                        ? <LetterView letter={this.props.letter} />
-                        : null
-                }
+                {this.props.letter ? (
+                    <LetterView letter={this.props.letter} />
+                ) : null}
                 {/* <PhraseView /> */}
                 <input
                     onChange={this.handleChange}
@@ -51,13 +47,17 @@ export default class MainView extends React.Component<MainViewProperties>
                     className="morseInput"
                     autoCorrect="off"
                     autoCapitalize="off"
-                    ref={this.inputRef} />
-                {
-                    (this.props.statusMessage) 
-                        ? <div className="status">{this.props.statusMessage}</div>
-                        : null
-                }
-                <button className="startButton" onClick={this.handleStopRequest}>(stop)</button>
+                    ref={this.inputRef}
+                />
+                {this.props.statusMessage ? (
+                    <div className="status">{this.props.statusMessage}</div>
+                ) : null}
+                <button
+                    className="startButton"
+                    onClick={this.handleStopRequest}
+                >
+                    (stop)
+                </button>
             </>
         );
     }
@@ -67,10 +67,10 @@ export default class MainView extends React.Component<MainViewProperties>
         if (shouldCancel) {
             e.preventDefault();
         }
-    }
+    };
 
     private handleStopRequest = () => {
         this.props.onStopRequest();
         this.inputRef.current?.focus();
-    }
+    };
 }
