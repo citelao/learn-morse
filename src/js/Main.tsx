@@ -107,7 +107,7 @@ export default class Main extends React.Component<{}, MainState>
             case "introduce_listening":
                 throw new Error("Listening practice is unimplemented");
                 // return this.renderListeningPractice();
-            case "introduce_letter":
+            case "introduce_letter": {
                 const availableLetters = getLettersForLesson(this.state.learningState.currentLesson);
                 const currentLetter = availableLetters[availableLetters.length - 1];
                 return <IntroduceLetter
@@ -115,6 +115,7 @@ export default class Main extends React.Component<{}, MainState>
                     onRequestRenderMorse={this.renderMorse}
                     onStopRequest={this.handleStopRequest}
                     onSuccess={this.handleSuccess} />;
+            }
             case "tutorial_phrase_practice":
                 return <PhrasePracticeTutorialView onBegin={this.handleBegin} />;
             case "phrase_practice":

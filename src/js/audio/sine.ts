@@ -14,7 +14,7 @@ function createSineOscillator(context: AudioContext, frequencyInHertz: number): 
 interface IOscillatorPair {
     oscillator: OscillatorNode,
     gain: GainNode
-};
+}
 
 /**
  * Create a sine oscillator connected to a gain node.

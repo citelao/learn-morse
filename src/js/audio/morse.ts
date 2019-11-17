@@ -10,7 +10,7 @@ function parseMorseSymbols(symbols: string): MorseSymbol[] {
     const chars = symbols.split("");
     
     // Validate the string:
-    const isValid = chars.every((char) => isMorseSymbol);
+    const isValid = chars.every(isMorseSymbol);
     if (!isValid) {
         throw new Error(`Invalid morse symbols in '${symbols}'`);
     }
@@ -124,7 +124,7 @@ export function generateMorseNotes(context: AudioContext, message: string, optio
             const isFirstCharacter = (currentMorseChars.length === 0);
 
             const symbols = getMorseForCharacter(char);
-            const notes = symbols.reduce<INote[]>((currentPoints, symbol, symbolIndex) => {
+            const notes = symbols.reduce<INote[]>((currentPoints, symbol) => {
                 const isFirstPointInCharacter = (currentPoints.length === 0);
                 let timeOffset = 0;
                 if (isFirstPointInCharacter) {

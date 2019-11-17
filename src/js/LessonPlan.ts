@@ -72,7 +72,7 @@ function getNextStatePartial(currentState: ILessonPlanState, action: IAction): P
         switch(currentState.quizMode) {
             case QuizMode.VisibleSingle:
             case QuizMode.InvisibleSingle:
-            case QuizMode.InvisibleWord:
+            case QuizMode.InvisibleWord: {
                 const newWord = getNewWord({
                     currentLesson: currentState.currentLesson,
                     quizMode: currentState.quizMode
@@ -83,7 +83,8 @@ function getNextStatePartial(currentState: ILessonPlanState, action: IAction): P
                     wordId: (currentState.wordId || 0) + 1,
                     currentGuess: "",
                 };
-            case QuizMode.InvisiblePhrase:
+            }
+            case QuizMode.InvisiblePhrase: {
                 // TODO: do this on user advance, too.
                 const phrase: string[] = [];
                 const PHRASE_LENGTH = 6;
@@ -100,6 +101,7 @@ function getNextStatePartial(currentState: ILessonPlanState, action: IAction): P
                     currentPhrase: phrase,
                     currentGuess: "",
                 };
+            }
         }
     } else if (action.newGuess) {
         const isFullGuess = action.newGuess.length === currentState.currentWord?.length;

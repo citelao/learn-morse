@@ -1,8 +1,6 @@
 import React from "react";
-import BeginView from "./BeginView";
 import { IGuess } from "../LessonPlan";
 import LetterView from "./quiz_view/LetterView";
-import PhraseView from "./quiz_view/PhraseView";
 
 export interface MainViewProperties {
     letter?: string,
