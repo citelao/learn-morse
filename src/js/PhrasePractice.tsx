@@ -115,19 +115,43 @@ export default class PhrasePractice extends React.Component<
         const results = guesses.map((guess, index) => {
             const truth = this.props.phrase[index];
 
-            // TODO: visually diff the two strings.
+            const true_difference = levenshtein(truth, guess);
+            const letterwise_diff = truth.split("").map((true_letter, index) => {
+                const guess_letter = guess.split("")[index];
+                if (guess_letter !== true_letter) {
+                    return true_letter;
+                } else {
+                    return " ";
+                }
+            });
+
+            const correct_letters = guess.split("").map((guess_letter, index) => {
+                const is_correct = letterwise_diff[index] === " ";
+                return (is_correct)
+                    ? <span key={index}>{guess_letter}{" "}</span>
+                    : <strong key={index}><u>{guess_letter}</u>{" "}</strong>;
+            });
+
+            const error_string = (true_difference > 0)
+                ? ` (Errors: ${true_difference})`
+                : "";
+
+            console.log(`Diff: '${letterwise_diff.join(" ")}'`);
 
             return (
                 <li key={index}>
-                    <p className="guess">{guess.split("").join(" ")}</p>
-                    <p className="truth">{truth.split("").join(" ")}</p>
+                    <p className="guess">{...correct_letters}</p>
+                    <p className="truth">{letterwise_diff.join(" ")}{error_string}</p>
                 </li>
             );
         });
 
+        const accuracy = gradeGuess(this.props.phrase, guesses);
+
         return (
             <section className="main">
                 <h1>Review</h1>
+                <p>Accuracy: {accuracy * 100}%</p>
                 <ol className="guesses">{...results}</ol>
                 <button onClick={this.handleContinue} className="startButton">
                     Continue!

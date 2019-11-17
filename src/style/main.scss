@@ -22,11 +22,13 @@
 }
 
 .guess {
-    font-weight: bold;
+    // font-weight: bold;
+    white-space: pre;
 }
 
 .truth {
     color: red;
+    white-space: pre;
 }
 
 .status {
