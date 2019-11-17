@@ -160,7 +160,7 @@ export function generateMorseNotes(
     } = {
         frequencyInHertz: 443,
         codingSpeed: 16,
-        effectiveSpeed: 12
+        effectiveSpeed: 6
     }
 ): INote[] {
     const speeds = getKochSpeeds(options.codingSpeed, options.effectiveSpeed);
