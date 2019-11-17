@@ -1,10 +1,10 @@
 import React from "react";
 
-export interface BeginViewProperties {
+export interface ContinueViewProperties {
     onBegin: () => void;
 }
 
-export default class BeginView extends React.Component<BeginViewProperties> {
+export default class ContinueView extends React.Component<BeginViewProperties> {
     constructor(props: BeginViewProperties) {
         super(props);
     }
@@ -14,15 +14,10 @@ export default class BeginView extends React.Component<BeginViewProperties> {
             <section className="main">
                 <h1>Learn morse!</h1>
                 <p>
-                    This app uses cookies to track your progress. By clicking OK,
-                    you consent to a cookie that tracks your lesson state and
-                    accuracy history.
-                </p>
-                <p>
-                    We use this to generate good lessons for you.
+                    Welcome back! Jump back into your Morse.
                 </p>
                 <button onClick={this.handleBegin} className="startButton">
-                    Begin!
+                    Continue!
                 </button>
             </section>
         );

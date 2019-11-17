@@ -9,6 +9,8 @@ import BeginView from "./view/BeginView";
 import IntroduceLetter from "./IntroduceLetter";
 import PhrasePractice from "./PhrasePractice";
 import assert from "./assert";
+import Cookie from "js-cookie";
+import ContinueView from "./view/ContinueView";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -16,6 +18,7 @@ function createAudioContext(): AudioContext {
 
 type AppState =
     | "unstarted"
+    | "unstarted_continue"
     | "tutorial_listening"
     | "introduce_listening"
     | "introduce_letter"
@@ -58,13 +61,41 @@ function generateLessonState(learningState: LearningState): LessonState {
     };
 }
 
-export default class Main extends React.Component<{}, MainState> {
-    state: MainState = {
-        appState: "unstarted",
-        learningState: {
+function storeLearningState(learningState: LearningState) {
+    const stringified_state = JSON.stringify(learningState);
+    console.log("Storing learning state", stringified_state);
+    Cookie.set("learningState", stringified_state, {
+        expires: 365,
+    });
+}
+
+function readLearningState(): LearningState {
+    const cookie = Cookie.get("learningState");
+    if (!cookie) {
+        console.log("Using default learning state");
+        const defaultLearningState: LearningState = {
             currentLesson: 1,
             history: []
-        }
+        };
+        return defaultLearningState;
+    }
+
+    const cookieJson = JSON.parse(cookie);
+    console.log("Using cached learning state", cookieJson);
+    return cookieJson as LearningState;
+}
+
+function hasStoredLearningState(): boolean {
+    const cookie = Cookie.get("learningState");
+    return !!cookie;
+}
+
+export default class Main extends React.Component<{}, MainState> {
+    state: MainState = {
+        appState: (hasStoredLearningState())
+            ? "unstarted_continue"
+            : "unstarted",
+        learningState: readLearningState()
     };
     // state: MainState = {
     //     appState: "phrase_practice",
@@ -100,12 +131,17 @@ export default class Main extends React.Component<{}, MainState> {
                 });
             }
         }
+
+        // Store a cookie of any new learning state!
+        storeLearningState(this.state.learningState);
     }
 
     render() {
         switch (this.state.appState) {
             case "unstarted":
                 return <BeginView onBegin={this.handleBegin} />;
+            case "unstarted_continue":
+                return <ContinueView onBegin={this.handleBegin} />;
             case "tutorial_listening":
                 return <ListeningTutorialView onBegin={this.handleBegin} />;
             case "introduce_listening":
@@ -159,6 +195,15 @@ export default class Main extends React.Component<{}, MainState> {
                     appState: "introduce_letter"
                 });
             }
+        } else if (this.state.appState === "unstarted_continue") {
+            assert(!ENABLE_LISTENING_PRACTICE,
+                "Continuation not specified for listening practice");
+
+            // Assume that the letter has already been introduced.
+            this.audioContext.resume();
+            this.setState({
+                appState: "phrase_practice"
+            });
         } else if (this.state.appState === "tutorial_listening") {
             this.audioContext.resume();
             this.setState({
