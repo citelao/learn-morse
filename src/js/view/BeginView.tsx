@@ -12,7 +12,7 @@ export default class BeginView extends React.Component<BeginViewProperties> {
     render() {
         return (
             <section className="main">
-                <h1>Learn morse!</h1>
+                <h1>Learn Morse!</h1>
                 <p>
                     This app uses cookies to track your progress. By clicking OK,
                     you consent to a cookie that tracks your lesson state and

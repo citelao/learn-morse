@@ -12,7 +12,7 @@ function parseMorseSymbols(symbols: string): MorseSymbol[] {
     // Validate the string:
     const isValid = chars.every(isMorseSymbol);
     if (!isValid) {
-        throw new Error(`Invalid morse symbols in '${symbols}'`);
+        throw new Error(`Invalid Morse symbols in '${symbols}'`);
     }
 
     return chars as MorseSymbol[];
@@ -69,7 +69,7 @@ function getMorseForCharacter(char: string): MorseSymbol[] {
 
     const morse = MORSE_ALPHABET[char];
     if (!morse) {
-        throw new Error(`Don't know morse for ${char}`);
+        throw new Error(`Don't know Morse for ${char}`);
     }
 
     return parseMorseSymbols(morse);
