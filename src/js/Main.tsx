@@ -135,6 +135,10 @@ export default class Main extends React.Component<{}, MainState> {
                     />
                 );
         }
+
+        // Compilation error if the switch is incomplete.
+        const _exhaustive: never = this.state.appState;
+        throw new Error(`Invalid render for state ${_exhaustive}`);
     }
 
     private handleBegin = () => {

@@ -21,6 +21,14 @@
     font-family: "Menlo", "Consolas", "Courier New", monospace;
 }
 
+.guess {
+    font-weight: bold;
+}
+
+.truth {
+    color: red;
+}
+
 .status {
     color: #555;
     font-size: 1.5rem;

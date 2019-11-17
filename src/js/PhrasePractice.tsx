@@ -2,6 +2,7 @@ import React from "react";
 import MainView from "./view/MainView";
 import { IGuess } from "./LessonPlan";
 import levenshtein from "js-levenshtein";
+import PhrasePracticeReviewView from "./view/PhrasePractiveReviewView";
 
 export interface PhrasePracticeProperties {
     phrase: string[];
@@ -15,6 +16,33 @@ export interface PhrasePracticeProperties {
 
 interface PhrasePracticeState {
     currentGuess: string;
+    isReview: boolean;
+}
+
+function gradeGuess(phrase: string[], guesses: string[]): number {
+    // Koch had a metric of "90% accuracy," though it is not entirely
+    // clear what that denoted. To better handle accidental skipped
+    // characters, use the Levenshtein distance between our guesses and
+    // the ground truth.
+    //
+    // Try to respect the "90% accuracy" as "90% of the characters
+    // correct." That means, for each character, there should be at most
+    // 0.1 Levenshtein "errors."
+    const distance = phrase.map((word, index) => {
+        return levenshtein(guesses[index], word);
+    });
+    console.log(`[${distance}]`);
+
+    const error = distance.reduce((runningTotalError, error) => {
+        return runningTotalError + error;
+    }, 0);
+    const totalCharacters = phrase.reduce<number>((runningTotalChars, word) => {
+        return runningTotalChars + word.length;
+    },
+    0);
+    const errorPercentage = error / totalCharacters;
+
+    return 1 - errorPercentage;
 }
 
 export default class PhrasePractice extends React.Component<
@@ -22,7 +50,8 @@ export default class PhrasePractice extends React.Component<
     PhrasePracticeState
 > {
     state: PhrasePracticeState = {
-        currentGuess: ""
+        currentGuess: "",
+        isReview: false
     };
 
     constructor(props: PhrasePracticeProperties) {
@@ -37,12 +66,17 @@ export default class PhrasePractice extends React.Component<
         if (prevProps.phrase != this.props.phrase) {
             this.props.onRequestRenderMorse(this.props.phrase.join(" "));
             this.setState({
-                currentGuess: ""
+                currentGuess: "",
+                isReview: false
             });
         }
     }
 
     render() {
+        if (this.state.isReview) {
+            return this.renderReview();
+        }
+
         // Generate dash strings for remaining phrases:
         const guesses = this.state.currentGuess.split(" ");
 
@@ -75,6 +109,33 @@ export default class PhrasePractice extends React.Component<
         );
     }
 
+    private renderReview() {
+        const guesses = this.state.currentGuess.split(" ");
+
+        const results = guesses.map((guess, index) => {
+            const truth = this.props.phrase[index];
+
+            // TODO: visually diff the two strings.
+
+            return (
+                <li key={index}>
+                    <p className="guess">{guess.split("").join(" ")}</p>
+                    <p className="truth">{truth.split("").join(" ")}</p>
+                </li>
+            );
+        });
+
+        return (
+            <section className="main">
+                <h1>Review</h1>
+                <ol className="guesses">{...results}</ol>
+                <button onClick={this.handleContinue} className="startButton">
+                    Continue!
+                </button>
+            </section>
+        );
+    }
+
     private handleGuess = (complete_guess: string): boolean => {
         console.log(complete_guess);
 
@@ -92,38 +153,10 @@ export default class PhrasePractice extends React.Component<
                 `Guesses & actual: \n[${guesses}]\n[${this.props.phrase}]`
             );
 
-            // Koch had a metric of "90% accuracy," though it is not entirely
-            // clear what that denoted. To better handle accidental skipped
-            // characters, use the Levenshtein distance between our guesses and
-            // the ground truth.
-            //
-            // Try to respect the "90% accuracy" as "90% of the characters
-            // correct." That means, for each character, there should be at most
-            // 0.1 Levenshtein "errors."
-            const distance = this.props.phrase.map((value, index) => {
-                return levenshtein(guesses[index], value);
+            this.props.onStopRequest();
+            this.setState({
+                isReview: true
             });
-            console.log(`[${distance}]`);
-
-            const error = distance.reduce((runningTotalError, error) => {
-                return runningTotalError + error;
-            }, 0);
-            const totalCharacters = this.props.phrase.reduce<number>(
-                (runningTotalChars, word) => {
-                    return runningTotalChars + word.length;
-                },
-                0
-            );
-            const errorPercentage = error / totalCharacters;
-            console.log(`Error: ${errorPercentage * 100}%`);
-
-            const DESIRED_ACCURACY = 0.9;
-            if (1 - errorPercentage >= DESIRED_ACCURACY) {
-                // TODO: we should keep track of this accuracy for later.
-                this.props.onSuccess();
-            } else {
-                this.props.onFailure(errorPercentage);
-            }
         } else {
             this.setState({
                 currentGuess: complete_guess
@@ -136,4 +169,18 @@ export default class PhrasePractice extends React.Component<
     private handleStopRequest = () => {
         this.props.onStopRequest();
     };
+
+    private handleContinue = () => {
+        // TODO
+        const grade = gradeGuess(this.props.phrase, this.state.currentGuess.split(" "));
+        console.log(`Accuracy: ${grade * 100}%`);
+
+        const DESIRED_ACCURACY = 0.9;
+        if (grade >= DESIRED_ACCURACY) {
+            // TODO: we should keep track of this accuracy for later.
+            this.props.onSuccess();
+        } else {
+            this.props.onFailure(1 - grade);
+        }
+    }
 }
