@@ -70,24 +70,41 @@ function storeLearningState(learningState: LearningState) {
 }
 
 function readLearningState(): LearningState {
-    const cookie = Cookie.get("learningState");
-    if (!cookie) {
+    const defaultLearningState: LearningState = {
+        currentLesson: 1,
+        history: []
+    };
+
+    if (!hasStoredLearningState()) {
         console.log("Using default learning state");
-        const defaultLearningState: LearningState = {
-            currentLesson: 1,
-            history: []
-        };
         return defaultLearningState;
     }
 
-    const cookieJson = JSON.parse(cookie);
+    // Cookie definitely exists at this point.
+    const cookie = Cookie.get("learningState");
+    const cookieJson: LearningState = JSON.parse(cookie!);
+
     console.log("Using cached learning state", cookieJson);
-    return cookieJson as LearningState;
+    return cookieJson;
 }
 
 function hasStoredLearningState(): boolean {
     const cookie = Cookie.get("learningState");
-    return !!cookie;
+
+    if (!cookie) {
+        return false;
+    }
+
+    const cookieJson: LearningState = JSON.parse(cookie);
+
+    // Special case the first lesson, since it's not interesting to test long
+    // strings of just the first letter:
+    if (cookieJson.currentLesson === 1) {
+        console.log("Found cached learning state, but it's only lesson one, so let's use default.");
+        return false;
+    }
+
+    return true;
 }
 
 export default class Main extends React.Component<{}, MainState> {
