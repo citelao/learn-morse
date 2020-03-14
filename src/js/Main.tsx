@@ -14,6 +14,7 @@ import { ILearningState, ILessonState } from "./storage/LearningStateInterfaces"
 import CookieStorage from "./storage/CookieStorage";
 import { getLearningState } from "./storage/Storage";
 import LocalStorage from "./storage/LocalStorage";
+import IStorage from "./storage/IStorage";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -37,9 +38,6 @@ interface MainState {
     lessonState?: ILessonState;
 }
 
-const cookieStorage = new CookieStorage();
-const localStorage = new LocalStorage();
-
 function generateLessonState(learningState: ILearningState): ILessonState {
     const phrase: string[] = [];
     const PHRASE_LENGTH = 6;
@@ -56,6 +54,8 @@ function generateLessonState(learningState: ILearningState): ILessonState {
 export default class Main extends React.Component<{}, MainState> {
     state: MainState;
 
+    private storage: IStorage = new CookieStorage();
+
     private audioContext: AudioContext;
     private scheduler: Scheduler;
 
@@ -66,7 +66,7 @@ export default class Main extends React.Component<{}, MainState> {
         this.scheduler = new Scheduler(window, this.audioContext);
         this.scheduler.start();
 
-        const learningState = getLearningState(cookieStorage);
+        const learningState = getLearningState(this.storage);
 
         this.state = {
             appState: !learningState.isDefault
@@ -100,7 +100,7 @@ export default class Main extends React.Component<{}, MainState> {
         }
 
         // Store a cookie of any new learning state!
-        cookieStorage.storeLearningState(this.state.learningState);
+        this.storage.storeLearningState(this.state.learningState);
     }
 
     render() {
