@@ -37,8 +37,7 @@ function gradeGuess(phrase: string[], guesses: string[]): number {
     }, 0);
     const totalCharacters = phrase.reduce<number>((runningTotalChars, word) => {
         return runningTotalChars + word.length;
-    },
-    0);
+    }, 0);
     const errorPercentage = error / totalCharacters;
 
     return 1 - errorPercentage;
@@ -115,32 +114,42 @@ export default class PhrasePractice extends React.Component<
             const truth = this.props.phrase[index];
 
             const true_difference = levenshtein(truth, guess);
-            const letterwise_diff = truth.split("").map((true_letter, index) => {
-                const guess_letter = guess.split("")[index];
-                if (guess_letter !== true_letter) {
-                    return true_letter;
-                } else {
-                    return " ";
-                }
-            });
+            const letterwise_diff = truth
+                .split("")
+                .map((true_letter, index) => {
+                    const guess_letter = guess.split("")[index];
+                    if (guess_letter !== true_letter) {
+                        return true_letter;
+                    } else {
+                        return " ";
+                    }
+                });
 
-            const correct_letters = guess.split("").map((guess_letter, index) => {
-                const is_correct = letterwise_diff[index] === " ";
-                return (is_correct)
-                    ? <span key={index}>{guess_letter}{" "}</span>
-                    : <strong key={index}><u>{guess_letter}</u>{" "}</strong>;
-            });
+            const correct_letters = guess
+                .split("")
+                .map((guess_letter, index) => {
+                    const is_correct = letterwise_diff[index] === " ";
+                    return is_correct ? (
+                        <span key={index}>{guess_letter} </span>
+                    ) : (
+                        <strong key={index}>
+                            <u>{guess_letter}</u>{" "}
+                        </strong>
+                    );
+                });
 
-            const error_string = (true_difference > 0)
-                ? ` (Errors: ${true_difference})`
-                : "";
+            const error_string =
+                true_difference > 0 ? ` (Errors: ${true_difference})` : "";
 
             console.log(`Diff: '${letterwise_diff.join(" ")}'`);
 
             return (
                 <li key={index}>
                     <p className="guess">{...correct_letters}</p>
-                    <p className="truth">{letterwise_diff.join(" ")}{error_string}</p>
+                    <p className="truth">
+                        {letterwise_diff.join(" ")}
+                        {error_string}
+                    </p>
                 </li>
             );
         });
@@ -194,7 +203,10 @@ export default class PhrasePractice extends React.Component<
     };
 
     private handleContinue = () => {
-        const accuracy = gradeGuess(this.props.phrase, this.state.currentGuess.split(" "));
+        const accuracy = gradeGuess(
+            this.props.phrase,
+            this.state.currentGuess.split(" ")
+        );
         console.log(`Accuracy: ${accuracy * 100}%`);
 
         const DESIRED_ACCURACY = 0.9;
@@ -203,5 +215,5 @@ export default class PhrasePractice extends React.Component<
         } else {
             this.props.onFailure(accuracy);
         }
-    }
+    };
 }

@@ -1,19 +1,22 @@
 {
     "name": "morse",
-    "version": "1.0.0",
-    "description": "## Development",
+    "version": "0.0.2",
+    "description": "Learn Morse!",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "watch": "parcel src/index.html",
+        "test": "$(npm bin)/jest",
+        "test:watch": "$(npm bin)/jest --watch",
+        "build:watch": "parcel src/index.html",
         "release:build": "parcel build src/index.html --public-url /learn-morse/",
         "release:deploy": "$(npm bin)/gh-pages -d dist/",
-        "release": "npm run release:build && npm run release:deploy"
+        "release": "npm run release:build && npm run release:deploy",
+        "lint:prettier": "$(npm bin)/prettier --write \"**/*.*\""
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "@types/jest": "^25.1.4",
         "@types/js-cookie": "^2.2.4",
         "@types/js-levenshtein": "^1.1.0",
         "@types/react": "^16.9.11",
@@ -29,10 +32,12 @@
         "eslint-plugin-react": "^7.16.0",
         "gh-pages": "^2.1.1",
         "husky": "^3.0.9",
+        "jest": "^25.1.0",
         "lint-staged": "^9.4.3",
         "parcel-plugin-clean-dist": "0.0.6",
         "prettier": "^1.19.1",
         "sass": "^1.23.3",
+        "ts-jest": "^25.2.1",
         "typescript": "^3.7.2"
     },
     "dependencies": {
@@ -41,20 +46,5 @@
         "js-levenshtein": "^1.1.6",
         "react": "^16.11.0",
         "react-dom": "^16.11.0"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
-    "lint-staged": {
-        "*.{js,css,json,md}": [
-            "prettier --write",
-            "git add"
-        ],
-        "*.js": [
-            "eslint --fix",
-            "git add"
-        ]
     }
 }

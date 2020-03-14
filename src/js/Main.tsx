@@ -9,8 +9,12 @@ import BeginView from "./view/BeginView";
 import IntroduceLetter from "./IntroduceLetter";
 import PhrasePractice from "./PhrasePractice";
 import assert from "./assert";
-import Cookie from "js-cookie";
 import ContinueView from "./view/ContinueView";
+import { ILearningState, ILessonState } from "./storage/LearningStateInterfaces";
+import CookieStorage from "./storage/CookieStorage";
+import { getLearningState, migrateStorage } from "./storage/Storage";
+import LocalStorage from "./storage/LocalStorage";
+import IStorage from "./storage/IStorage";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -27,28 +31,14 @@ type AppState =
 
 const ENABLE_LISTENING_PRACTICE = false;
 
-interface LessonResult {
-    lesson: number;
-    accuracy: number;
-}
-
-interface LearningState {
-    currentLesson: number;
-    history: LessonResult[];
-}
-
-interface LessonState {
-    currentPhrase: string[];
-}
-
 interface MainState {
     appState: AppState;
 
-    learningState: LearningState;
-    lessonState?: LessonState;
+    learningState: ILearningState;
+    lessonState?: ILessonState;
 }
 
-function generateLessonState(learningState: LearningState): LessonState {
+function generateLessonState(learningState: ILearningState): ILessonState {
     const phrase: string[] = [];
     const PHRASE_LENGTH = 6;
     for (let index = 0; index < PHRASE_LENGTH; index++) {
@@ -61,65 +51,10 @@ function generateLessonState(learningState: LearningState): LessonState {
     };
 }
 
-function storeLearningState(learningState: LearningState) {
-    const stringified_state = JSON.stringify(learningState);
-    console.log("Storing learning state", stringified_state);
-    Cookie.set("learningState", stringified_state, {
-        expires: 365,
-    });
-}
-
-function readLearningState(): LearningState {
-    const defaultLearningState: LearningState = {
-        currentLesson: 1,
-        history: []
-    };
-
-    if (!hasStoredLearningState()) {
-        console.log("Using default learning state");
-        return defaultLearningState;
-    }
-
-    // Cookie definitely exists at this point.
-    const cookie = Cookie.get("learningState");
-    const cookieJson: LearningState = JSON.parse(cookie!);
-
-    console.log("Using cached learning state", cookieJson);
-    return cookieJson;
-}
-
-function hasStoredLearningState(): boolean {
-    const cookie = Cookie.get("learningState");
-
-    if (!cookie) {
-        return false;
-    }
-
-    const cookieJson: LearningState = JSON.parse(cookie);
-
-    // Special case the first lesson, since it's not interesting to test long
-    // strings of just the first letter:
-    if (cookieJson.currentLesson === 1) {
-        console.log("Found cached learning state, but it's only lesson one, so let's use default.");
-        return false;
-    }
-
-    return true;
-}
-
 export default class Main extends React.Component<{}, MainState> {
-    state: MainState = {
-        appState: (hasStoredLearningState())
-            ? "unstarted_continue"
-            : "unstarted",
-        learningState: readLearningState()
-    };
-    // state: MainState = {
-    //     appState: "phrase_practice",
-    //     learningState: {
-    //         currentLesson: 2
-    //     },
-    // };
+    state: MainState;
+
+    private storage: IStorage = new LocalStorage();
 
     private audioContext: AudioContext;
     private scheduler: Scheduler;
@@ -130,6 +65,25 @@ export default class Main extends React.Component<{}, MainState> {
         this.audioContext = createAudioContext();
         this.scheduler = new Scheduler(window, this.audioContext);
         this.scheduler.start();
+
+        // We used to use cookies to store state. Migrate that over if possible.
+        const cookieStorage = new CookieStorage();
+        migrateStorage(cookieStorage, this.storage);
+
+        const learningState = getLearningState(this.storage);
+
+        this.state = {
+            appState: !learningState.isDefault
+                ? "unstarted_continue"
+                : "unstarted",
+            learningState: learningState.learningState
+        };
+        // this.state = {
+        //     appState: "phrase_practice",
+        //     learningState: {
+        //         currentLesson: 2
+        //     },
+        // };
     }
 
     componentDidMount() {
@@ -150,7 +104,7 @@ export default class Main extends React.Component<{}, MainState> {
         }
 
         // Store a cookie of any new learning state!
-        storeLearningState(this.state.learningState);
+        this.storage.storeLearningState(this.state.learningState);
     }
 
     render() {
@@ -213,8 +167,10 @@ export default class Main extends React.Component<{}, MainState> {
                 });
             }
         } else if (this.state.appState === "unstarted_continue") {
-            assert(!ENABLE_LISTENING_PRACTICE,
-                "Continuation not specified for listening practice");
+            assert(
+                !ENABLE_LISTENING_PRACTICE,
+                "Continuation not specified for listening practice"
+            );
 
             // Assume that the letter has already been introduced.
             this.audioContext.resume();
@@ -262,10 +218,13 @@ export default class Main extends React.Component<{}, MainState> {
                 appState: "introduce_letter",
                 learningState: {
                     currentLesson: this.state.learningState.currentLesson + 1,
-                    history: [...this.state.learningState.history, {
-                        accuracy: accuracy,
-                        lesson: this.state.learningState.currentLesson
-                    }]
+                    history: [
+                        ...this.state.learningState.history,
+                        {
+                            accuracy: accuracy,
+                            lesson: this.state.learningState.currentLesson
+                        }
+                    ]
                 }
             });
         } else {
@@ -280,10 +239,13 @@ export default class Main extends React.Component<{}, MainState> {
         this.setState({
             learningState: {
                 currentLesson: this.state.learningState.currentLesson,
-                history: [...this.state.learningState.history, {
-                    accuracy: accuracy,
-                    lesson: this.state.learningState.currentLesson
-                }]
+                history: [
+                    ...this.state.learningState.history,
+                    {
+                        accuracy: accuracy,
+                        lesson: this.state.learningState.currentLesson
+                    }
+                ]
             },
             lessonState: generateLessonState(this.state.learningState)
         });
