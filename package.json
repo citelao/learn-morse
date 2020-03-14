@@ -9,7 +9,8 @@
         "build:watch": "parcel src/index.html",
         "release:build": "parcel build src/index.html --public-url /learn-morse/",
         "release:deploy": "$(npm bin)/gh-pages -d dist/",
-        "release": "npm run release:build && npm run release:deploy"
+        "release": "npm run release:build && npm run release:deploy",
+        "lint:prettier": "$(npm bin)/prettier --write \"**/*.*\""
     },
     "keywords": [],
     "author": "",

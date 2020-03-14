@@ -14,13 +14,11 @@ export default class BeginView extends React.Component<BeginViewProperties> {
             <section className="main">
                 <h1>Learn Morse!</h1>
                 <p>
-                    This app uses cookies to track your progress. By clicking OK,
-                    you consent to a cookie that tracks your lesson state and
-                    accuracy history.
+                    This app uses cookies to track your progress. By clicking
+                    OK, you consent to a cookie that tracks your lesson state
+                    and accuracy history.
                 </p>
-                <p>
-                    We use this to generate good lessons for you.
-                </p>
+                <p>We use this to generate good lessons for you.</p>
                 <button onClick={this.handleBegin} className="startButton">
                     Begin!
                 </button>

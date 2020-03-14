@@ -60,7 +60,7 @@ function getMorseForCharacter(char: string): MorseSymbol[] {
         "?": "..--..",
         ".": ".-.-.-",
         "/": "-..-.",
-        "=": "-...-",
+        "=": "-...-"
     };
 
     if (char.length > 1) {

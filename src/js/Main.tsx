@@ -156,8 +156,10 @@ export default class Main extends React.Component<{}, MainState> {
                 });
             }
         } else if (this.state.appState === "unstarted_continue") {
-            assert(!ENABLE_LISTENING_PRACTICE,
-                "Continuation not specified for listening practice");
+            assert(
+                !ENABLE_LISTENING_PRACTICE,
+                "Continuation not specified for listening practice"
+            );
 
             // Assume that the letter has already been introduced.
             this.audioContext.resume();
@@ -205,10 +207,13 @@ export default class Main extends React.Component<{}, MainState> {
                 appState: "introduce_letter",
                 learningState: {
                     currentLesson: this.state.learningState.currentLesson + 1,
-                    history: [...this.state.learningState.history, {
-                        accuracy: accuracy,
-                        lesson: this.state.learningState.currentLesson
-                    }]
+                    history: [
+                        ...this.state.learningState.history,
+                        {
+                            accuracy: accuracy,
+                            lesson: this.state.learningState.currentLesson
+                        }
+                    ]
                 }
             });
         } else {
@@ -223,10 +228,13 @@ export default class Main extends React.Component<{}, MainState> {
         this.setState({
             learningState: {
                 currentLesson: this.state.learningState.currentLesson,
-                history: [...this.state.learningState.history, {
-                    accuracy: accuracy,
-                    lesson: this.state.learningState.currentLesson
-                }]
+                history: [
+                    ...this.state.learningState.history,
+                    {
+                        accuracy: accuracy,
+                        lesson: this.state.learningState.currentLesson
+                    }
+                ]
             },
             lessonState: generateLessonState(this.state.learningState)
         });
