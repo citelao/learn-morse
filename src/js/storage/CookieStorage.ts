@@ -4,19 +4,6 @@ import { generateWordForLesson } from "../LessonPlan";
 import Cookie from "js-cookie";
 
 export default class CookieStorage implements IStorage {
-    public generateLessonState(learningState: ILearningState): ILessonState {
-        const phrase: string[] = [];
-        const PHRASE_LENGTH = 6;
-        for (let index = 0; index < PHRASE_LENGTH; index++) {
-            phrase.push(generateWordForLesson(learningState.currentLesson));
-        }
-
-        console.log(`generateLessonState - phrase [${phrase}]`);
-        return {
-            currentPhrase: phrase
-        };
-    }
-
     public storeLearningState(learningState: ILearningState) {
         const stringified_state = JSON.stringify(learningState);
         console.log("Storing learning state", stringified_state);

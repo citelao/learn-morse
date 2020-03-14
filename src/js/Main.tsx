@@ -37,6 +37,19 @@ interface MainState {
 
 const storage = new CookieStorage();
 
+function generateLessonState(learningState: ILearningState): ILessonState {
+    const phrase: string[] = [];
+    const PHRASE_LENGTH = 6;
+    for (let index = 0; index < PHRASE_LENGTH; index++) {
+        phrase.push(generateWordForLesson(learningState.currentLesson));
+    }
+
+    console.log(`generateLessonState - phrase [${phrase}]`);
+    return {
+        currentPhrase: phrase
+    };
+}
+
 export default class Main extends React.Component<{}, MainState> {
     state: MainState = {
         appState: storage.hasStoredLearningState()
@@ -65,7 +78,7 @@ export default class Main extends React.Component<{}, MainState> {
     componentDidMount() {
         if (this.state.appState === "phrase_practice") {
             this.setState({
-                lessonState: storage.generateLessonState(this.state.learningState)
+                lessonState: generateLessonState(this.state.learningState)
             });
         }
     }
@@ -74,7 +87,7 @@ export default class Main extends React.Component<{}, MainState> {
         if (this.state.appState != prevState.appState) {
             if (this.state.appState === "phrase_practice") {
                 this.setState({
-                    lessonState: storage.generateLessonState(this.state.learningState)
+                    lessonState: generateLessonState(this.state.learningState)
                 });
             }
         }
@@ -215,7 +228,7 @@ export default class Main extends React.Component<{}, MainState> {
                     lesson: this.state.learningState.currentLesson
                 }]
             },
-            lessonState: storage.generateLessonState(this.state.learningState)
+            lessonState: generateLessonState(this.state.learningState)
         });
     };
 
