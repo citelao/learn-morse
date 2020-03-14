@@ -6,9 +6,4 @@ export default interface IStorage {
 
     /** Read the learning state, returning null if no state exists. */
     readLearningState(): ILearningState | null;
-
-    /**
-     * Do we have a stored state?
-     */
-    hasStoredLearningState(): boolean;
 }

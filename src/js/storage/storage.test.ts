@@ -9,10 +9,7 @@ describe("getLearningState()", () => {
                 throw new Error("Method not implemented.");
             }
             readLearningState(): ILearningState | null {
-                throw new Error("Method not implemented.");
-            }
-            hasStoredLearningState(): boolean {
-                return false;
+                return null;
             }
         }
 
@@ -32,9 +29,6 @@ describe("getLearningState()", () => {
             readLearningState(): ILearningState | null {
                 return state;
             }
-            hasStoredLearningState(): boolean {
-                return true;
-            }
         }
 
         const result = getLearningState(new MockStorage());
@@ -53,9 +47,6 @@ describe("getLearningState()", () => {
             }
             readLearningState(): ILearningState | null {
                 return state;
-            }
-            hasStoredLearningState(): boolean {
-                return true;
             }
         }
 

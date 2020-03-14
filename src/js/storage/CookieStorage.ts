@@ -13,23 +13,12 @@ export default class CookieStorage implements IStorage {
     }
 
     public readLearningState(): ILearningState | null {
-        if (!this.hasStoredLearningState()) {
+        const cookie = Cookie.get("learningState");
+        if (!cookie) {
             return null;
         }
 
-        // Cookie definitely exists at this point.
-        const cookie = Cookie.get("learningState");
-        const cookieJson: ILearningState = JSON.parse(cookie!);
+        const cookieJson: ILearningState = JSON.parse(cookie);
         return cookieJson;
-    }
-
-    public hasStoredLearningState(): boolean {
-        const cookie = Cookie.get("learningState");
-
-        if (!cookie) {
-            return false;
-        }
-
-        return true;
     }
 }

@@ -18,8 +18,8 @@ export function getLearningState(storage: IStorage): {
     isDefault: boolean;
     learningState: ILearningState;
 } {
-    const hasLearningState = storage.hasStoredLearningState();
-    if (!hasLearningState) {
+    const learningState = storage.readLearningState();
+    if (!learningState) {
         console.log("Using default learning state");
         return {
             isDefault: true,
@@ -27,10 +27,6 @@ export function getLearningState(storage: IStorage): {
         };
     }
 
-    const learningState = storage.readLearningState();
-    if (!learningState) {
-        throw new Error("Storage said it had a learning state, but it didn't");
-    }
     const shouldUseDefaultLearningState = isFirstLesson(learningState);
     if (shouldUseDefaultLearningState) {
         console.log(
