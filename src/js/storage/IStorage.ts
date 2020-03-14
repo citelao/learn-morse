@@ -8,8 +8,7 @@ export default interface IStorage {
     readLearningState(): ILearningState | null;
 
     /**
-     * Do we have a stored state? Should return false if we're only on lesson
-     * one, so we can restart.
+     * Do we have a stored state?
      */
     hasStoredLearningState(): boolean;
 }

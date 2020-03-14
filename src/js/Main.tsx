@@ -12,7 +12,7 @@ import assert from "./assert";
 import ContinueView from "./view/ContinueView";
 import { ILearningState, ILessonState } from "./storage/LearningStateInterfaces";
 import CookieStorage from "./storage/CookieStorage";
-import { getDefaultLearningState } from "./storage/Storage";
+import { getLearningState } from "./storage/Storage";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -53,10 +53,10 @@ function generateLessonState(learningState: ILearningState): ILessonState {
 
 export default class Main extends React.Component<{}, MainState> {
     state: MainState = {
-        appState: storage.hasStoredLearningState()
+        appState: !getLearningState(storage).isDefault
             ? "unstarted_continue"
             : "unstarted",
-        learningState: storage.readLearningState() || getDefaultLearningState()
+        learningState: getLearningState(storage).learningState
     };
     // state: MainState = {
     //     appState: "phrase_practice",
