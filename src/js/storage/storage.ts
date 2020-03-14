@@ -14,6 +14,22 @@ function isFirstLesson(learningState: ILearningState): boolean {
     return learningState.currentLesson === 1;
 }
 
+export function migrateStorage(oldStorage: IStorage, newStorage: IStorage) {
+    if (newStorage.readLearningState()) {
+        console.log("There is already state in the new storage. Ignore.");
+        return;
+    }
+
+    const oldState = oldStorage.readLearningState();
+
+    if (!oldState) {
+        console.log("No state to migrate!");
+        return;
+    }
+
+    newStorage.storeLearningState(oldState);
+}
+
 export function getLearningState(storage: IStorage): {
     isDefault: boolean;
     learningState: ILearningState;
