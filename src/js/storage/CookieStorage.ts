@@ -2,6 +2,7 @@ import IStorage from "./IStorage";
 import { ILearningState, ILessonState } from "./LearningStateInterfaces";
 import { generateWordForLesson } from "../LessonPlan";
 import Cookie from "js-cookie";
+import { getDefaultLearningState, isFirstLesson } from "./Storage";
 
 export default class CookieStorage implements IStorage {
     public storeLearningState(learningState: ILearningState) {
@@ -13,14 +14,9 @@ export default class CookieStorage implements IStorage {
     }
 
     public readLearningState(): ILearningState {
-        const defaultLearningState: ILearningState = {
-            currentLesson: 1,
-            history: []
-        };
-
         if (!this.hasStoredLearningState()) {
             console.log("Using default learning state");
-            return defaultLearningState;
+            return getDefaultLearningState();
         }
 
         // Cookie definitely exists at this point.
@@ -42,7 +38,7 @@ export default class CookieStorage implements IStorage {
 
         // Special case the first lesson, since it's not interesting to test long
         // strings of just the first letter:
-        if (cookieJson.currentLesson === 1) {
+        if (isFirstLesson(cookieJson)) {
             console.log(
                 "Found cached learning state, but it's only lesson one, so let's use default."
             );
