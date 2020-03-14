@@ -13,6 +13,7 @@ import ContinueView from "./view/ContinueView";
 import { ILearningState, ILessonState } from "./storage/LearningStateInterfaces";
 import CookieStorage from "./storage/CookieStorage";
 import { getLearningState } from "./storage/Storage";
+import LocalStorage from "./storage/LocalStorage";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -36,7 +37,8 @@ interface MainState {
     lessonState?: ILessonState;
 }
 
-const storage = new CookieStorage();
+const cookieStorage = new CookieStorage();
+const localStorage = new LocalStorage();
 
 function generateLessonState(learningState: ILearningState): ILessonState {
     const phrase: string[] = [];
@@ -52,18 +54,7 @@ function generateLessonState(learningState: ILearningState): ILessonState {
 }
 
 export default class Main extends React.Component<{}, MainState> {
-    state: MainState = {
-        appState: !getLearningState(storage).isDefault
-            ? "unstarted_continue"
-            : "unstarted",
-        learningState: getLearningState(storage).learningState
-    };
-    // state: MainState = {
-    //     appState: "phrase_practice",
-    //     learningState: {
-    //         currentLesson: 2
-    //     },
-    // };
+    state: MainState;
 
     private audioContext: AudioContext;
     private scheduler: Scheduler;
@@ -74,6 +65,21 @@ export default class Main extends React.Component<{}, MainState> {
         this.audioContext = createAudioContext();
         this.scheduler = new Scheduler(window, this.audioContext);
         this.scheduler.start();
+
+        const learningState = getLearningState(cookieStorage);
+
+        this.state = {
+            appState: !learningState.isDefault
+                ? "unstarted_continue"
+                : "unstarted",
+            learningState: learningState.learningState
+        };
+        // this.state = {
+        //     appState: "phrase_practice",
+        //     learningState: {
+        //         currentLesson: 2
+        //     },
+        // };
     }
 
     componentDidMount() {
@@ -94,7 +100,7 @@ export default class Main extends React.Component<{}, MainState> {
         }
 
         // Store a cookie of any new learning state!
-        storage.storeLearningState(this.state.learningState);
+        cookieStorage.storeLearningState(this.state.learningState);
     }
 
     render() {
