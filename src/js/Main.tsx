@@ -11,7 +11,7 @@ import PhrasePractice from "./PhrasePractice";
 import assert from "./assert";
 import Cookie from "js-cookie";
 import ContinueView from "./view/ContinueView";
-import { ILearningState } from "./storage/LearningState";
+import { ILearningState, ILessonState } from "./storage/LearningState";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -28,18 +28,14 @@ type AppState =
 
 const ENABLE_LISTENING_PRACTICE = false;
 
-interface LessonState {
-    currentPhrase: string[];
-}
-
 interface MainState {
     appState: AppState;
 
     learningState: ILearningState;
-    lessonState?: LessonState;
+    lessonState?: ILessonState;
 }
 
-function generateLessonState(learningState: ILearningState): LessonState {
+function generateLessonState(learningState: ILearningState): ILessonState {
     const phrase: string[] = [];
     const PHRASE_LENGTH = 6;
     for (let index = 0; index < PHRASE_LENGTH; index++) {
