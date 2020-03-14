@@ -13,10 +13,10 @@ export default class CookieStorage implements IStorage {
         });
     }
 
-    public readLearningState(): ILearningState {
+    public readLearningState(): ILearningState | null {
         if (!this.hasStoredLearningState()) {
             console.log("Using default learning state");
-            return getDefaultLearningState();
+            return null;
         }
 
         // Cookie definitely exists at this point.
