@@ -1,6 +1,5 @@
 import IStorage from "./IStorage";
-import { ILearningState, ILessonState } from "./LearningStateInterfaces";
-import { generateWordForLesson } from "../LessonPlan";
+import { ILearningState } from "./LearningStateInterfaces";
 import Cookie from "js-cookie";
 
 export default class CookieStorage implements IStorage {
