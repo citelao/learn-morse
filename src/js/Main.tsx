@@ -32,7 +32,7 @@ interface LessonResult {
     accuracy: number;
 }
 
-interface LearningState {
+interface ILearningState {
     currentLesson: number;
     history: LessonResult[];
 }
@@ -44,11 +44,11 @@ interface LessonState {
 interface MainState {
     appState: AppState;
 
-    learningState: LearningState;
+    learningState: ILearningState;
     lessonState?: LessonState;
 }
 
-function generateLessonState(learningState: LearningState): LessonState {
+function generateLessonState(learningState: ILearningState): LessonState {
     const phrase: string[] = [];
     const PHRASE_LENGTH = 6;
     for (let index = 0; index < PHRASE_LENGTH; index++) {
@@ -61,7 +61,7 @@ function generateLessonState(learningState: LearningState): LessonState {
     };
 }
 
-function storeLearningState(learningState: LearningState) {
+function storeLearningState(learningState: ILearningState) {
     const stringified_state = JSON.stringify(learningState);
     console.log("Storing learning state", stringified_state);
     Cookie.set("learningState", stringified_state, {
@@ -69,8 +69,8 @@ function storeLearningState(learningState: LearningState) {
     });
 }
 
-function readLearningState(): LearningState {
-    const defaultLearningState: LearningState = {
+function readLearningState(): ILearningState {
+    const defaultLearningState: ILearningState = {
         currentLesson: 1,
         history: []
     };
@@ -82,7 +82,7 @@ function readLearningState(): LearningState {
 
     // Cookie definitely exists at this point.
     const cookie = Cookie.get("learningState");
-    const cookieJson: LearningState = JSON.parse(cookie!);
+    const cookieJson: ILearningState = JSON.parse(cookie!);
 
     console.log("Using cached learning state", cookieJson);
     return cookieJson;
@@ -95,7 +95,7 @@ function hasStoredLearningState(): boolean {
         return false;
     }
 
-    const cookieJson: LearningState = JSON.parse(cookie);
+    const cookieJson: ILearningState = JSON.parse(cookie);
 
     // Special case the first lesson, since it's not interesting to test long
     // strings of just the first letter:
