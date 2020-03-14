@@ -1,4 +1,4 @@
-import { ILearningState, ILessonState } from "./LearningState";
+import { ILearningState, ILessonState } from "./LearningStateInterfaces";
 
 export default interface IStorage {
     /** Store the learning state with no conditions. */

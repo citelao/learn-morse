@@ -1,5 +1,5 @@
 import IStorage from "./IStorage";
-import { ILearningState, ILessonState } from "./LearningState";
+import { ILearningState, ILessonState } from "./LearningStateInterfaces";
 import { generateWordForLesson } from "../LessonPlan";
 import Cookie from "js-cookie";
 
