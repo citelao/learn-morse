@@ -9,9 +9,9 @@ import BeginView from "./view/BeginView";
 import IntroduceLetter from "./IntroduceLetter";
 import PhrasePractice from "./PhrasePractice";
 import assert from "./assert";
-import Cookie from "js-cookie";
 import ContinueView from "./view/ContinueView";
 import { ILearningState, ILessonState } from "./storage/LearningState";
+import CookieStorage from "./storage/CookieStorage";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -35,71 +35,14 @@ interface MainState {
     lessonState?: ILessonState;
 }
 
-function generateLessonState(learningState: ILearningState): ILessonState {
-    const phrase: string[] = [];
-    const PHRASE_LENGTH = 6;
-    for (let index = 0; index < PHRASE_LENGTH; index++) {
-        phrase.push(generateWordForLesson(learningState.currentLesson));
-    }
-
-    console.log(`generateLessonState - phrase [${phrase}]`);
-    return {
-        currentPhrase: phrase
-    };
-}
-
-function storeLearningState(learningState: ILearningState) {
-    const stringified_state = JSON.stringify(learningState);
-    console.log("Storing learning state", stringified_state);
-    Cookie.set("learningState", stringified_state, {
-        expires: 365,
-    });
-}
-
-function readLearningState(): ILearningState {
-    const defaultLearningState: ILearningState = {
-        currentLesson: 1,
-        history: []
-    };
-
-    if (!hasStoredLearningState()) {
-        console.log("Using default learning state");
-        return defaultLearningState;
-    }
-
-    // Cookie definitely exists at this point.
-    const cookie = Cookie.get("learningState");
-    const cookieJson: ILearningState = JSON.parse(cookie!);
-
-    console.log("Using cached learning state", cookieJson);
-    return cookieJson;
-}
-
-function hasStoredLearningState(): boolean {
-    const cookie = Cookie.get("learningState");
-
-    if (!cookie) {
-        return false;
-    }
-
-    const cookieJson: ILearningState = JSON.parse(cookie);
-
-    // Special case the first lesson, since it's not interesting to test long
-    // strings of just the first letter:
-    if (cookieJson.currentLesson === 1) {
-        console.log("Found cached learning state, but it's only lesson one, so let's use default.");
-        return false;
-    }
-
-    return true;
-}
+const storage = new CookieStorage();
 
 export default class Main extends React.Component<{}, MainState> {
     state: MainState = {
-        appState: (hasStoredLearningState())
+        appState: storage.hasStoredLearningState()
             ? "unstarted_continue"
             : "unstarted",
-        learningState: readLearningState()
+        learningState: storage.readLearningState()
     };
     // state: MainState = {
     //     appState: "phrase_practice",
@@ -122,7 +65,7 @@ export default class Main extends React.Component<{}, MainState> {
     componentDidMount() {
         if (this.state.appState === "phrase_practice") {
             this.setState({
-                lessonState: generateLessonState(this.state.learningState)
+                lessonState: storage.generateLessonState(this.state.learningState)
             });
         }
     }
@@ -131,13 +74,13 @@ export default class Main extends React.Component<{}, MainState> {
         if (this.state.appState != prevState.appState) {
             if (this.state.appState === "phrase_practice") {
                 this.setState({
-                    lessonState: generateLessonState(this.state.learningState)
+                    lessonState: storage.generateLessonState(this.state.learningState)
                 });
             }
         }
 
         // Store a cookie of any new learning state!
-        storeLearningState(this.state.learningState);
+        storage.storeLearningState(this.state.learningState);
     }
 
     render() {
@@ -272,7 +215,7 @@ export default class Main extends React.Component<{}, MainState> {
                     lesson: this.state.learningState.currentLesson
                 }]
             },
-            lessonState: generateLessonState(this.state.learningState)
+            lessonState: storage.generateLessonState(this.state.learningState)
         });
     };
 
