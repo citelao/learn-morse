@@ -10,7 +10,7 @@ import IntroduceLetter from "./IntroduceLetter";
 import PhrasePractice from "./PhrasePractice";
 import assert from "./assert";
 import ContinueView from "./view/ContinueView";
-import { ILearningState, ILessonState } from "./storage/LearningState";
+import { ILearningState, ILessonState } from "./storage/LearningStateInterfaces";
 import CookieStorage from "./storage/CookieStorage";
 
 function createAudioContext(): AudioContext {
