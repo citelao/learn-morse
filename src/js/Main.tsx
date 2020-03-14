@@ -12,7 +12,7 @@ import assert from "./assert";
 import ContinueView from "./view/ContinueView";
 import { ILearningState, ILessonState } from "./storage/LearningStateInterfaces";
 import CookieStorage from "./storage/CookieStorage";
-import { getLearningState } from "./storage/Storage";
+import { getLearningState, migrateStorage } from "./storage/Storage";
 import LocalStorage from "./storage/LocalStorage";
 import IStorage from "./storage/IStorage";
 
@@ -54,7 +54,7 @@ function generateLessonState(learningState: ILearningState): ILessonState {
 export default class Main extends React.Component<{}, MainState> {
     state: MainState;
 
-    private storage: IStorage = new CookieStorage();
+    private storage: IStorage = new LocalStorage();
 
     private audioContext: AudioContext;
     private scheduler: Scheduler;
@@ -65,6 +65,10 @@ export default class Main extends React.Component<{}, MainState> {
         this.audioContext = createAudioContext();
         this.scheduler = new Scheduler(window, this.audioContext);
         this.scheduler.start();
+
+        // We used to use cookies to store state. Migrate that over if possible.
+        const cookieStorage = new CookieStorage();
+        migrateStorage(cookieStorage, this.storage);
 
         const learningState = getLearningState(this.storage);
 
