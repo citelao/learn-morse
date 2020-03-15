@@ -67,6 +67,23 @@ export default class MainView extends React.Component<MainViewProperties> {
                 </button>
                 <Dialog>
                     <h1>Options</h1>
+
+                    <ul>
+                        <li>
+                            <label>
+                                Speed (WPM)
+
+                                <input type="number"/>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                Pitch
+
+                                <input type="range" name="" min="0" max="12" step="1" id=""/>
+                            </label>
+                        </li>
+                    </ul>
                 </Dialog>
             </>
         );
