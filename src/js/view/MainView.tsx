@@ -1,6 +1,7 @@
 import React from "react";
 import { IGuess } from "../LessonPlan";
 import LetterView from "./quiz_view/LetterView";
+import Dialog from "./Dialog";
 
 export interface MainViewProperties {
     letter?: string;
@@ -58,6 +59,15 @@ export default class MainView extends React.Component<MainViewProperties> {
                 >
                     (stop)
                 </button>
+                <button
+                    className="optionsButton"
+                    onClick={this.handleOptionsRequest}
+                >
+                    Options
+                </button>
+                <Dialog>
+                    <h1>Options</h1>
+                </Dialog>
             </>
         );
     }
@@ -72,5 +82,9 @@ export default class MainView extends React.Component<MainViewProperties> {
     private handleStopRequest = () => {
         this.props.onStopRequest();
         this.inputRef.current?.focus();
+    };
+
+    private handleOptionsRequest = () => {
+
     };
 }
