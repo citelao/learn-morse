@@ -67,13 +67,19 @@ export default class Scheduler {
     private handleAnimationFrame = () => {
         // See https://www.html5rocks.com/en/tutorials/audio/scheduling/
         const frameTime = this.audioContext.currentTime;
+        let playedNotes = 0;
         while (
             this.queuedNotes.length > 0 &&
             this.queuedNotes[0].startTime < frameTime
         ) {
             const playedNote = this.queuedNotes.splice(0, 1)[0];
             playedNote.callback(frameTime);
+            playedNotes++;
             // console.log(frameTime);
+        }
+
+        if (playedNotes) {
+            console.log(`Played notes: ${playedNotes}`);
         }
 
         // this.window.requestAnimationFrame(this.handleAnimationFrame);

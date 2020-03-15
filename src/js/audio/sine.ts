@@ -1,7 +1,9 @@
 import { INote } from "./Scheduler";
 
-/** A number close to 0 but not quite 0 so we can exponentially decay to it. */
-const EPSILON = 0.00001;
+/** A magnitude close to 0 but not quite 0 so we can exponentially decay to it. */
+const EPSILON = 0.0001;
+
+const DECAY_TIME = 0.05;
 
 function createSineOscillator(
     context: AudioContext,
@@ -77,7 +79,7 @@ export function generateSineNote(options: {
                 );
                 oscillator.gain.gain.exponentialRampToValueAtTime(
                     EPSILON,
-                    currentTime + 0.05
+                    currentTime + DECAY_TIME
                 );
             },
             cancellationCallback: currentTime => {
@@ -88,7 +90,7 @@ export function generateSineNote(options: {
                     );
                     oscillator.gain.gain.exponentialRampToValueAtTime(
                         EPSILON,
-                        currentTime + 0.05
+                        currentTime + DECAY_TIME
                     );
                 }
             }
