@@ -2,21 +2,6 @@ import React from "react";
 import Dialog from "./view/Dialog";
 import { IRenderOptions } from "./audio/IRenderOptions";
 
-// export class AppOptions {
-//     private static instance: AppOptions | null = null;
-//     public static getInstance() {
-//         if (!this.instance) {
-//             this.instance = new AppOptions();
-//         }
-
-//         return this.instance;
-//     }
-
-//     public WordSpeed: number = 16;
-
-//     public Pitch: number = 392;
-// }
-
 export interface OptionsProperties {
     onChange: (change: Partial<IRenderOptions>) => void;
     state: IRenderOptions;
