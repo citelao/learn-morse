@@ -120,7 +120,7 @@ export function getSpeeds(wordsPerMinute: number): ISpeeds {
     return speeds;
 }
 
-export function getKochSpeeds(
+function getKochSpeeds(
     codingWordsPerMinute: number,
     effectiveWordsPerMinute: number
 ): ISpeeds {
@@ -158,7 +158,7 @@ export function generateMorseNotes(
         codingSpeed: number;
         effectiveSpeed: number;
     } = {
-        frequencyInHertz: 443,
+        frequencyInHertz: 392,
         codingSpeed: 16,
         effectiveSpeed: 6
     }

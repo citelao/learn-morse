@@ -1,7 +1,14 @@
 import { INote } from "./Scheduler";
 
-/** A number close to 0 but not quite 0 so we can exponentially decay to it. */
-const EPSILON = 0.00001;
+/**
+ * Time when the set value reaches 63.2% of its desired value
+ * (https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/setTargetAtTime)
+ **/
+const DECAY_CONSTANT_IN_SECONDS = 0.01;
+
+// Volumes to decay to.
+const MAX_VOLUME = 1;
+const MIN_VOLUME = 0;
 
 function createSineOscillator(
     context: AudioContext,
@@ -60,10 +67,10 @@ export function generateSineNote(options: {
         {
             timeFromNowInSeconds: timeFromNowInSeconds,
             callback: currentTime => {
-                oscillator.gain.gain.setValueAtTime(EPSILON, currentTime);
-                oscillator.gain.gain.exponentialRampToValueAtTime(
-                    1,
-                    currentTime + 0.05
+                oscillator.gain.gain.setTargetAtTime(
+                    MAX_VOLUME,
+                    currentTime,
+                    DECAY_CONSTANT_IN_SECONDS
                 );
                 wasStarted = true;
             }
@@ -71,24 +78,18 @@ export function generateSineNote(options: {
         {
             timeFromNowInSeconds: timeFromNowInSeconds + options.duration,
             callback: currentTime => {
-                oscillator.gain.gain.setValueAtTime(
-                    oscillator.gain.gain.value,
-                    currentTime
-                );
-                oscillator.gain.gain.exponentialRampToValueAtTime(
-                    EPSILON,
-                    currentTime + 0.05
+                oscillator.gain.gain.setTargetAtTime(
+                    MIN_VOLUME,
+                    currentTime,
+                    DECAY_CONSTANT_IN_SECONDS
                 );
             },
             cancellationCallback: currentTime => {
                 if (wasStarted) {
-                    oscillator.gain.gain.setValueAtTime(
-                        oscillator.gain.gain.value,
-                        currentTime
-                    );
-                    oscillator.gain.gain.exponentialRampToValueAtTime(
-                        EPSILON,
-                        currentTime + 0.05
+                    oscillator.gain.gain.setTargetAtTime(
+                        MIN_VOLUME,
+                        currentTime,
+                        DECAY_CONSTANT_IN_SECONDS
                     );
                 }
             }
