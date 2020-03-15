@@ -15,6 +15,7 @@ import CookieStorage from "./storage/CookieStorage";
 import { getLearningState, migrateStorage } from "./storage/Storage";
 import LocalStorage from "./storage/LocalStorage";
 import IStorage from "./storage/IStorage";
+import { IRenderOptions } from "./audio/IRenderOptions";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -36,6 +37,8 @@ interface MainState {
 
     learningState: ILearningState;
     lessonState?: ILessonState;
+
+    renderOptions: IRenderOptions;
 }
 
 function generateLessonState(learningState: ILearningState): ILessonState {
@@ -76,7 +79,12 @@ export default class Main extends React.Component<{}, MainState> {
             appState: !learningState.isDefault
                 ? "unstarted_continue"
                 : "unstarted",
-            learningState: learningState.learningState
+            learningState: learningState.learningState,
+            renderOptions: {
+                frequencyInHertz: 392,
+                codingSpeed: 16,
+                effectiveSpeed: 6
+            }
         };
         // this.state = {
         //     appState: "phrase_practice",
@@ -130,6 +138,8 @@ export default class Main extends React.Component<{}, MainState> {
                         onRequestRenderMorse={this.renderMorse}
                         onStopRequest={this.handleStopRequest}
                         onSuccess={this.handleSuccess}
+                        renderOptions={this.state.renderOptions}
+                        onOptionsChange={this.handleOptionsChanged}
                     />
                 );
             }
@@ -145,6 +155,8 @@ export default class Main extends React.Component<{}, MainState> {
                         onStopRequest={this.handleStopRequest}
                         onSuccess={this.handleSuccess}
                         onFailure={this.handleFailure}
+                        renderOptions={this.state.renderOptions}
+                        onOptionsChange={this.handleOptionsChanged}
                     />
                 );
         }
@@ -253,7 +265,11 @@ export default class Main extends React.Component<{}, MainState> {
 
     private renderMorse = (phrase: string) => {
         console.log(`Rendering ${phrase}`);
-        const notes = generateMorseNotes(this.audioContext, phrase);
+        const notes = generateMorseNotes(this.audioContext, phrase, {
+            frequencyInHertz: this.state.renderOptions.frequencyInHertz,
+            codingSpeed: this.state.renderOptions.codingSpeed,
+            effectiveSpeed: this.state.renderOptions.effectiveSpeed
+        });
         this.scheduler.clear();
         this.scheduler.scheduleNotes(notes);
     };
@@ -261,5 +277,12 @@ export default class Main extends React.Component<{}, MainState> {
     private handleStopRequest = () => {
         console.log("Stopping!");
         this.scheduler.clear();
+    };
+
+    private handleOptionsChanged = (options: Partial<IRenderOptions>) => {
+        const newOptions = Object.assign({}, this.state.renderOptions, options);
+        this.setState({
+            renderOptions: newOptions
+        });
     };
 }

@@ -1,5 +1,6 @@
 import React from "react";
 import MainView from "./view/MainView";
+import { IRenderOptions } from "./audio/IRenderOptions";
 
 export interface IntroduceLetterProperties {
     letter: string;
@@ -8,6 +9,9 @@ export interface IntroduceLetterProperties {
     onStopRequest: () => void;
 
     onSuccess: () => void;
+
+    onOptionsChange: (change: Partial<IRenderOptions>) => void;
+    renderOptions: IRenderOptions;
 }
 
 interface IntroduceLetterState {}
@@ -44,6 +48,8 @@ export default class IntroduceLetter extends React.Component<
                     guessHistory={[]}
                     onGuess={this.handleGuess}
                     onStopRequest={this.handleStopRequest}
+                    renderOptions={this.props.renderOptions}
+                    onOptionsChange={this.props.onOptionsChange}
                 />
             </section>
         );

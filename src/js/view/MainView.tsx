@@ -2,15 +2,19 @@ import React from "react";
 import { IGuess } from "../LessonPlan";
 import LetterView from "./quiz_view/LetterView";
 import Dialog from "./Dialog";
+import Options from "../Options";
+import { IRenderOptions } from "../audio/IRenderOptions";
 
 export interface MainViewProperties {
     letter?: string;
     currentGuess: string;
     guessHistory: IGuess[];
     statusMessage: string | null;
+    renderOptions: IRenderOptions;
 
     onGuess: (char: string) => boolean;
     onStopRequest: () => void;
+    onOptionsChange: (change: Partial<IRenderOptions>) => void;
 }
 
 export default class MainView extends React.Component<MainViewProperties> {
@@ -65,26 +69,10 @@ export default class MainView extends React.Component<MainViewProperties> {
                 >
                     Options
                 </button>
-                <Dialog>
-                    <h1>Options</h1>
-
-                    <ul>
-                        <li>
-                            <label>
-                                Speed (WPM)
-
-                                <input type="number"/>
-                            </label>
-                        </li>
-                        <li>
-                            <label>
-                                Pitch
-
-                                <input type="range" name="" min="0" max="12" step="1" id=""/>
-                            </label>
-                        </li>
-                    </ul>
-                </Dialog>
+                <Options
+                    onChange={this.props.onOptionsChange}
+                    state={this.props.renderOptions}
+                />
             </>
         );
     }

@@ -2,6 +2,7 @@ import React from "react";
 import MainView from "./view/MainView";
 import { IGuess } from "./LessonPlan";
 import levenshtein from "js-levenshtein";
+import { IRenderOptions } from "./audio/IRenderOptions";
 
 export interface PhrasePracticeProperties {
     phrase: string[];
@@ -11,6 +12,9 @@ export interface PhrasePracticeProperties {
 
     onSuccess: (accuracy: number) => void;
     onFailure: (accuracy: number) => void;
+
+    renderOptions: IRenderOptions;
+    onOptionsChange: (change: Partial<IRenderOptions>) => void;
 }
 
 interface PhrasePracticeState {
@@ -102,6 +106,8 @@ export default class PhrasePractice extends React.Component<
                     guessHistory={guessHistory}
                     onGuess={this.handleGuess}
                     onStopRequest={this.handleStopRequest}
+                    renderOptions={this.props.renderOptions}
+                    onOptionsChange={this.props.onOptionsChange}
                 />
             </section>
         );

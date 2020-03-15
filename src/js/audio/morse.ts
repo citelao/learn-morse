@@ -1,5 +1,6 @@
 import { INote } from "./Scheduler";
 import { generateSineNote } from "./sine";
+import { IRenderOptions } from "./IRenderOptions";
 
 type MorseSymbol = "-" | ".";
 function isMorseSymbol(char: string): char is MorseSymbol {
@@ -153,11 +154,7 @@ function getKochSpeeds(
 export function generateMorseNotes(
     context: AudioContext,
     message: string,
-    options: {
-        frequencyInHertz: number;
-        codingSpeed: number;
-        effectiveSpeed: number;
-    } = {
+    options: IRenderOptions = {
         frequencyInHertz: 392,
         codingSpeed: 16,
         effectiveSpeed: 6
