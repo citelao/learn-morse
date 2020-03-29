@@ -61,6 +61,7 @@ body {
     border-radius: 1rem;
 
     cursor: pointer;
+    transition: all 0.3s cubic-bezier(0,.71,.24,1.35);
 
     &:hover {
         transform: scale(1.05);
