@@ -53,7 +53,7 @@ export default class MainView extends React.Component<MainViewProperties> {
                     <div className="status">{this.props.statusMessage}</div>
                 ) : null}
                 <button
-                    className="startButton"
+                    className="stopButton"
                     onClick={this.handleStopRequest}
                 >
                     (stop)
