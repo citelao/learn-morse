@@ -52,7 +52,8 @@ body {
     display: block;
 
     width: 100%;
-    background: #e0e0e0;
+    $bg: #e0e0e0;
+    background: $bg;
     padding: 1rem;
 
     font-size: 3rem;
@@ -67,6 +68,11 @@ body {
         transform: scale(1.05);
     }
 
+    &:hover,
+    &:focus {
+        background: darken($bg, 10%);
+    }
+
     &:focus {
         outline: none;
         box-shadow: inset 0 0 0 3px #000;
@@ -74,6 +80,7 @@ body {
 
     &:active {
         transform: scale(0.95);
+        background: darken($bg, 20%);
     }
 }
 
