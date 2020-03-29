@@ -1,3 +1,9 @@
+// Variables
+$accent: rgb(64, 233, 182);
+$accent_text_color: #000;
+
+// Rules
+
 * {
     box-sizing: border-box;
 }
@@ -53,6 +59,36 @@ body {
     margin: 0 auto;
     border-radius: 1rem;
 }
+
+    .startButton {
+        cursor: pointer;
+        background: $accent;
+        color: $accent_text_color;
+        // border: 3px solid darken($accent, 40%);
+        border: none;
+        // box-shadow: 
+        //     inset 0 0 0 4px darken($accent, 40%),
+        //     inset 0 0 0 8px lighten($accent, 40%);
+
+        &:hover,
+        &:focus {
+            background: lighten($accent, 10%);
+        }
+
+            &:hover {
+                transform: scale(1.05);
+            }
+
+            &:focus {
+                outline: none;
+                box-shadow: inset 0 0 0 3px #000;
+            }
+
+        &:active {
+            background: darken($accent, 10%);
+            transform: scale(0.95);
+        }
+    }
 
 .morseInput {
     width: 100%;
