@@ -55,8 +55,9 @@ export default class MainView extends React.Component<MainViewProperties> {
                 <button
                     className="stopButton"
                     onClick={this.handleStopRequest}
+                    title="Pause"
                 >
-                    (stop)
+                    ❚❚
                 </button>
             </>
         );
