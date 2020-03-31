@@ -64,11 +64,16 @@ body {
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0,.71,.24,1.35);
 
-    &:hover {
-        transform: scale(1.05);
+    @media (hover: hover) {
+        &:hover {
+            transform: scale(1.05);
+        }
+
+        &:hover {
+            background: darken($bg, 10%);
+        }
     }
 
-    &:hover,
     &:focus {
         background: darken($bg, 10%);
     }
@@ -88,7 +93,12 @@ body {
         background: $accent;
         color: $accent_text_color;
 
-        &:hover,
+        @media (hover: hover) {
+            &:hover {
+                background: lighten($accent, 10%);
+            }
+        }
+
         &:focus {
             background: lighten($accent, 10%);
         }
