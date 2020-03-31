@@ -2,6 +2,21 @@
 $accent: rgb(46, 119, 230);
 $accent_text_color: #fff;
 
+// Functions
+
+// Foo
+@mixin focus_and_hover {
+    @media (hover: hover) {
+        &:hover {
+            @content;
+        }
+    }
+
+    &:focus {
+        @content;
+    }
+}
+
 // Rules
 
 * {
@@ -64,18 +79,14 @@ body {
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0,.71,.24,1.35);
 
+    @include focus_and_hover {
+        background: darken($bg, 10%);
+    }
+
     @media (hover: hover) {
         &:hover {
             transform: scale(1.05);
         }
-
-        &:hover {
-            background: darken($bg, 10%);
-        }
-    }
-
-    &:focus {
-        background: darken($bg, 10%);
     }
 
     &:focus {
@@ -93,13 +104,7 @@ body {
         background: $accent;
         color: $accent_text_color;
 
-        @media (hover: hover) {
-            &:hover {
-                background: lighten($accent, 10%);
-            }
-        }
-
-        &:focus {
+        @include focus_and_hover {
             background: lighten($accent, 10%);
         }
 
