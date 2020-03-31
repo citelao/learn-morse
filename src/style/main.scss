@@ -83,6 +83,7 @@ body {
         background: darken($bg, 10%);
     }
 
+    // This is annoying if it applies when you tab to things
     @media (hover: hover) {
         &:hover {
             transform: scale(1.05);
