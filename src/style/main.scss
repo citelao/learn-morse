@@ -130,12 +130,15 @@ body {
         }
     }
 
-    // Put the stop button in the corner
-    .stopButton {
-        position: fixed;
-        top: 1rem;
-        right: 1rem;
-        width: auto;
+    // Put the stop button in the corner if we're using a touch screen (which
+    // will probably have a touch keyboard at the bottom of the screen).
+    @media (pointer: coarse) {
+        .stopButton {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            width: auto;
+        }
     }
 
 .morseInput {
