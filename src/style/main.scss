@@ -118,6 +118,14 @@ body {
         }
     }
 
+    // Put the stop button in the corner
+    .stopButton {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        width: auto;
+    }
+
 .morseInput {
     width: 100%;
     border: 2px solid;
