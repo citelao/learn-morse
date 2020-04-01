@@ -119,6 +119,8 @@ body {
         background: $accent;
         color: $accent_text_color;
 
+        margin: 1rem 0;
+
         @include focus_and_hover {
             background: lighten($accent, 10%);
         }
