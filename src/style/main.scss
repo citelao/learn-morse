@@ -2,6 +2,9 @@
 $accent: rgb(46, 119, 230);
 $accent_text_color: #fff;
 
+$secondary_text_color: #555;
+$tertiary_text_color: #888;
+
 // Functions
 
 // Foo
@@ -46,7 +49,26 @@ body {
 }
 
 .guesses {
-    font-family: "Monaco", "Lucida Console", "Lucida Sans Typewriter", "Courier New", monospace;
+    /* https://www.client9.com/css-system-font-stack-monospace-v2/ */
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        Menlo,
+        Courier,
+        monospace;
+
+    list-style: none;
+    padding: 0;
+    
+    counter-reset: guess-counter;
+    li {
+        counter-increment: guess-counter;
+
+        &:before {
+            content: counter(guess-counter) ". ";
+        }
+    }
 }
 
 .guess {
@@ -60,7 +82,7 @@ body {
 }
 
 .status {
-    color: #555;
+    color: $secondary_text_color;
     font-size: 1.5rem;
     margin: 0.5rem 0;
 }
