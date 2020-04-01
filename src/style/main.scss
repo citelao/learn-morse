@@ -57,18 +57,6 @@ body {
         Menlo,
         Courier,
         monospace;
-
-    list-style: none;
-    padding: 0;
-    
-    counter-reset: guess-counter;
-    li {
-        counter-increment: guess-counter;
-
-        &:before {
-            content: counter(guess-counter) ". ";
-        }
-    }
 }
 
 .guess {
