@@ -2,6 +2,7 @@
 
 ## v0.0.3
 
+- Changed: massively increased frequency. Now you can hear it.
 - Changed: make it pretty.
 
 ## v0.0.2
