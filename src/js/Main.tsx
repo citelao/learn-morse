@@ -9,7 +9,6 @@ import BeginView from "./view/BeginView";
 import IntroduceLetter from "./IntroduceLetter";
 import PhrasePractice from "./PhrasePractice";
 import assert from "./assert";
-import ContinueView from "./view/ContinueView";
 import {
     ILearningState,
     ILessonState
