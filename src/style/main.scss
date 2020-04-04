@@ -141,6 +141,15 @@ body {
         }
     }
 
+    .stopButton {
+        // Force the button to be a square.
+        height: 5rem;
+        width: 5rem;
+        line-height: 0;
+
+        border-radius: 2.5rem;
+    }
+
 .morseInput {
     width: 100%;
     border: 2px solid;
