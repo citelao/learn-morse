@@ -16,8 +16,12 @@ export default class BeginView extends React.Component<BeginViewProperties> {
                     <h1>Morse Horse</h1>
                     <h2>Can a horse teach Morse? Of&nbsp;course!</h2>
                 </hgroup>
+                {/*
+                    Note: all images use fully-qualified paths. I don't know if
+                    that will make deploying to sub-directories difficult.
+                */}
                 <img
-                    src="/img/morse_horse.png"
+                    src="/img/morse_horse_600w.png"
                     className="logo"
                     alt="Cartoon horse smiling with two dashes on his nose to look like a mustache"
                 />

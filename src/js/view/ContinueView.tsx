@@ -15,7 +15,7 @@ export default class ContinueView extends React.Component<BeginViewProperties> {
                 <h1>Morse Horse: "learn more Morse!"</h1>
                 <p>Welcome back! Jump back into your Morse.</p>
                 <img
-                    src="/img/morse_horse.png"
+                    src="/img/morse_horse_600w.png"
                     className="logo"
                     alt="Cartoon horse smiling with two dashes on his nose to look like a mustache"
                 />
