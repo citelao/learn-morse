@@ -33,4 +33,4 @@ Here's a shortlist of todo items:
 
 1. Pull the changes to release.
 2. `npm run release`
-    - Note: the `--public-url` is configured for its current subdomain.
+    - Note: since we do not deploy to a subdirectory, `--public-url` is unset.

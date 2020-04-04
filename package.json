@@ -7,7 +7,7 @@
         "test": "$(npm bin)/jest",
         "test:watch": "$(npm bin)/jest --watch",
         "build:watch": "parcel src/index.html",
-        "release:build": "parcel build src/index.html --public-url /learn-morse/",
+        "release:build": "parcel build src/index.html",
         "release:deploy": "$(npm bin)/gh-pages -d dist/",
         "release": "npm run release:build && npm run release:deploy",
         "lint:prettier": "$(npm bin)/prettier --write \"**/*.*\""

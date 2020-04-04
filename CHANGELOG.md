@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.5
+
+- Changed: Updated public-url.
+
 ## v0.0.4
 
 - Changed: Added a CNAME record.
