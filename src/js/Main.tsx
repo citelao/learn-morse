@@ -117,8 +117,8 @@ export default class Main extends React.Component<{}, MainState> {
                 const headings =
                     this.state.appState === "unstarted" ? (
                         <hgroup className="title">
-                            <h1>Morse Horse</h1>
-                            <h2>Can a horse teach Morse? Of&nbsp;course!</h2>
+                            <h1>"I teach Morse!"</h1>
+                            <h2>&mdash; Morse Horse</h2>
                         </hgroup>
                     ) : (
                         <>
