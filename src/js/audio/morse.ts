@@ -158,7 +158,7 @@ export function generateMorseNotes(
         codingSpeed: number;
         effectiveSpeed: number;
     } = {
-        frequencyInHertz: 392,
+        frequencyInHertz: 800,
         codingSpeed: 16,
         effectiveSpeed: 6
     }

@@ -12,6 +12,23 @@ See `CHANGELOG.md`.
 
 1. `npm run watch`
 
+### TODO
+
+Here's a shortlist of todo items:
+
+* [ ] Logo
+* [ ] Make it clear that we play lots of words in a set.
+    * Add a progress bar?
+    * Add a playing animation?
+    * Make entering text a lot easier.
+* [ ] Add a countdown before the round starts, to help people get centered.
+* [ ] Graph accuracy over time (and mark new letters).
+* [ ] Make the pause button a stop/restart button.
+* [ ] Allow users to replay letters.
+* [ ] Allow users to test out of letters.
+* [ ] Allow users to focus on problematic letters.
+* [ ] Allow users to change sending speed, gaps, pitch, and pitch separation.
+
 ## Release
 
 1. Pull the changes to release.

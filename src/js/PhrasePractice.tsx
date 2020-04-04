@@ -159,7 +159,7 @@ export default class PhrasePractice extends React.Component<
         return (
             <section className="main">
                 <h1>Review</h1>
-                <p>Accuracy: {accuracy * 100}%</p>
+                <p>Accuracy: {(accuracy * 100).toFixed(2)}%</p>
                 <ol className="guesses">{...results}</ol>
                 <button onClick={this.handleContinue} className="startButton">
                     Continue!
