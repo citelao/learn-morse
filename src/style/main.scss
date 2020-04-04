@@ -36,6 +36,11 @@ body {
 
 h1 {
     font-size: 2rem;
+    margin: 0.5rem 0;
+}
+
+h2 {
+    margin: 0.5rem 0;
 }
 
 .main {
@@ -48,7 +53,9 @@ h1 {
 }
 
 .logo {
-    max-width: 35vh;
+    $max-size: 40vh;
+    max-width: $max-size;
+    max-height: $max-size;
     margin: 0 auto;
     display: block;
 }

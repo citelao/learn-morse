@@ -2,6 +2,9 @@ import React from "react";
 
 export interface BeginViewProperties {
     onBegin: () => void;
+
+    headings: React.ReactElement;
+    buttonText: string;
 }
 
 export default class BeginView extends React.Component<BeginViewProperties> {
@@ -12,21 +15,20 @@ export default class BeginView extends React.Component<BeginViewProperties> {
     render() {
         return (
             <section className="main">
-                <hgroup className="title">
-                    <h1>Morse Horse</h1>
-                    <h2>Can a horse teach Morse? Of&nbsp;course!</h2>
-                </hgroup>
+                {this.props.headings}
                 {/*
                     Note: all images use fully-qualified paths. I don't know if
                     that will make deploying to sub-directories difficult.
                 */}
                 <img
                     src="/img/morse_horse_600w.png"
+                    width="300"
+                    height="300"
                     className="logo"
                     alt="Cartoon horse smiling with two dashes on his nose to look like a mustache"
                 />
                 <button onClick={this.handleBegin} className="startButton">
-                    Begin!
+                    {this.props.buttonText}
                 </button>
                 <h2>What is Morse Horse?</h2>
                 <p>
