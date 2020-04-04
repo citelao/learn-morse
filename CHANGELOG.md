@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.0.7
+
+- Added: branded as Morse Horse!
+- Fixed: removed bizarre "app" dependency.
+- Fixed: updated odd dependencies.
+
 ## v0.0.6
 
 - Changed: Use an a bare domain instead.
