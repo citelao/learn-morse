@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.4
+
+- Changed: Added a CNAME record.
+
 ## v0.0.3
 
 - Changed: massively increased frequency. Now you can hear it.
