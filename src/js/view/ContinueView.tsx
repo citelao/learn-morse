@@ -12,8 +12,13 @@ export default class ContinueView extends React.Component<BeginViewProperties> {
     render() {
         return (
             <section className="main">
-                <h1>Learn Morse!</h1>
+                <h1>Morse Horse: "learn more Morse!"</h1>
                 <p>Welcome back! Jump back into your Morse.</p>
+                <img
+                    src="/img/morse_horse.png"
+                    className="logo"
+                    alt="Cartoon horse smiling with two dashes on his nose to look like a mustache"
+                />
                 <button onClick={this.handleBegin} className="startButton">
                     Continue!
                 </button>
