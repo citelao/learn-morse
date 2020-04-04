@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.6
+
+- Changed: Use an a bare domain instead.
+
 ## v0.0.5
 
 - Changed: Updated public-url.
