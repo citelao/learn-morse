@@ -7,7 +7,8 @@ $tertiary_text_color: #888;
 
 // Functions
 
-// Foo
+// Quick mixin to add styles on focus and hover (where hover is supported). This
+// ensures that you don't get bizarre lingering hover effects on iOS.
 @mixin focus_and_hover {
     @media (hover: hover) {
         &:hover {
@@ -96,7 +97,8 @@ body {
         background: darken($bg, 10%);
     }
 
-    // This is annoying if it applies when you tab to things
+    // This is annoying if it applies when you tab to things, so only apply on
+    // hover.
     @media (hover: hover) {
         &:hover {
             transform: scale(1.05);
