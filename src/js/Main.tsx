@@ -10,7 +10,10 @@ import IntroduceLetter from "./IntroduceLetter";
 import PhrasePractice from "./PhrasePractice";
 import assert from "./assert";
 import ContinueView from "./view/ContinueView";
-import { ILearningState, ILessonState } from "./storage/LearningStateInterfaces";
+import {
+    ILearningState,
+    ILessonState
+} from "./storage/LearningStateInterfaces";
 import CookieStorage from "./storage/CookieStorage";
 import { getLearningState, migrateStorage } from "./storage/Storage";
 import LocalStorage from "./storage/LocalStorage";
@@ -110,9 +113,34 @@ export default class Main extends React.Component<{}, MainState> {
     render() {
         switch (this.state.appState) {
             case "unstarted":
-                return <BeginView onBegin={this.handleBegin} />;
-            case "unstarted_continue":
-                return <ContinueView onBegin={this.handleBegin} />;
+            case "unstarted_continue": {
+                const headings =
+                    this.state.appState === "unstarted" ? (
+                        <hgroup className="title">
+                            <h1>"I teach Morse!"</h1>
+                            <h2>&mdash; Morse Horse</h2>
+                        </hgroup>
+                    ) : (
+                        <>
+                            <hgroup className="title">
+                                <h1>"Learn more Morse!"</h1>
+                                <h2>&mdash; Morse Horse</h2>
+                            </hgroup>
+                            <p className="title">Welcome back to <strong>Morse Horse</strong>! Jump back into your Morse.</p>
+                        </>
+                    );
+                const buttonText =
+                    this.state.appState === "unstarted"
+                        ? "Begin!"
+                        : "Continue!";
+                return (
+                    <BeginView
+                        headings={headings}
+                        buttonText={buttonText}
+                        onBegin={this.handleBegin}
+                    />
+                );
+            }
             case "tutorial_listening":
                 return <ListeningTutorialView onBegin={this.handleBegin} />;
             case "introduce_listening":

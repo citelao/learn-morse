@@ -32,10 +32,10 @@ export default class PhrasePracticeTutorialView extends React.Component<
                     Don't worry! It's just 2 letters (for now), and the space
                     between words is lengthened.
                 </p>
-                <p>
-                    Type the letters as you hear them. When you hear a space,
-                    type a space.
-                </p>
+                <ul>
+                    <li>Type the letters as you hear them.</li>
+                    <li>When you hear a space, type a space.</li>
+                </ul>
                 <p>
                     When you have typed all five words, you'll see how you did.
                 </p>

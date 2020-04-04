@@ -47,5 +47,9 @@
         "js-levenshtein": "^1.1.6",
         "react": "^16.11.0",
         "react-dom": "^16.11.0"
+    },
+    "staticFiles": {
+        "staticPath": "static",
+        "watcherGlob": "**/*"
     }
 }

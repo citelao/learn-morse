@@ -16,7 +16,7 @@ See `CHANGELOG.md`.
 
 Here's a shortlist of todo items:
 
-* [ ] Logo
+* [x] Logo
 * [ ] Make it clear that we play lots of words in a set.
     * Add a progress bar?
     * Add a playing animation?
