@@ -122,7 +122,7 @@ export default class Main extends React.Component<{}, MainState> {
                     ) : (
                         <>
                             <hgroup className="title">
-                                <h1>"Learn more Morse!"</h1>
+                                <h1>"Welcome back! Learn more Morse!"</h1>
                                 <h2>&mdash; Morse Horse</h2>
                             </hgroup>
                             <p className="title">Welcome back to <strong>Morse Horse</strong>! Jump back into your Morse.</p>
@@ -131,7 +131,7 @@ export default class Main extends React.Component<{}, MainState> {
                 const buttonText =
                     this.state.appState === "unstarted"
                         ? "Begin!"
-                        : "Continue!";
+                        : "Resume!";
                 return (
                     <BeginView
                         headings={headings}
