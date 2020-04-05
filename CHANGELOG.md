@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.0.8
+
+- Changed: page title
+- Changed: wording on resume page is now more distinct that you are resuming.
+
 ## v0.0.7
 
 - Added: branded as Morse Horse!
