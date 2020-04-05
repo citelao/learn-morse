@@ -1,20 +1,20 @@
 import React from "react";
 
-export interface AnnouncerProperties {}
+export interface LiveRegionAnnouncerProperties {}
 
-interface AnnouncerState {
+interface LiveRegionAnnouncerState {
     message: string;
 }
 
-export default class Announcer extends React.Component<
-    AnnouncerProperties,
-    AnnouncerState
+export default class LiveRegionAnnouncer extends React.Component<
+    LiveRegionAnnouncerProperties,
+    LiveRegionAnnouncerState
 > {
-    state: AnnouncerState = {
+    state: LiveRegionAnnouncerState = {
         message: "Foo!"
     };
 
-    constructor(props: AnnouncerProperties) {
+    constructor(props: LiveRegionAnnouncerProperties) {
         super(props);
 
         setTimeout(() => {

@@ -17,7 +17,7 @@ import CookieStorage from "./storage/CookieStorage";
 import { getLearningState, migrateStorage } from "./storage/Storage";
 import LocalStorage from "./storage/LocalStorage";
 import IStorage from "./storage/IStorage";
-import Announcer from "./accessibility/Announcer";
+import LiveRegionAnnouncer from "./accessibility/LiveRegionAnnouncer";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -114,7 +114,7 @@ export default class Main extends React.Component<{}, MainState> {
         return (
             <>
                 {this.renderContent()}
-                <Announcer />
+                <LiveRegionAnnouncer />
             </>
         );
     }
