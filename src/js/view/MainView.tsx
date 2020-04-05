@@ -42,6 +42,8 @@ export default class MainView extends React.Component<MainViewProperties> {
                 ) : null}
                 {/* <PhraseView /> */}
                 <input
+                    aria-label="Guess"
+                    aria-describedBy="statusBar"
                     onChange={this.handleChange}
                     value={this.props.currentGuess}
                     className="morseInput"
@@ -50,12 +52,12 @@ export default class MainView extends React.Component<MainViewProperties> {
                     ref={this.inputRef}
                 />
                 {this.props.statusMessage ? (
-                    <div className="status">{this.props.statusMessage}</div>
+                    <div className="status" id="statusBar">{this.props.statusMessage}</div>
                 ) : null}
                 <button
                     className="stopButton"
                     onClick={this.handleStopRequest}
-                    title="Stop"
+                    aria-label="Stop"
                 >
                     ■
                 </button>
