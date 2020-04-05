@@ -17,6 +17,7 @@ import CookieStorage from "./storage/CookieStorage";
 import { getLearningState, migrateStorage } from "./storage/Storage";
 import LocalStorage from "./storage/LocalStorage";
 import IStorage from "./storage/IStorage";
+import Announcer from "./accessibility/Announcer";
 
 function createAudioContext(): AudioContext {
     return new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -110,6 +111,15 @@ export default class Main extends React.Component<{}, MainState> {
     }
 
     render() {
+        return (
+            <>
+                {this.renderContent()}
+                <Announcer />
+            </>
+        );
+    }
+
+    private renderContent(): React.ReactElement {
         switch (this.state.appState) {
             case "unstarted":
             case "unstarted_continue": {
@@ -125,13 +135,14 @@ export default class Main extends React.Component<{}, MainState> {
                                 <h1>"Welcome back! Learn more Morse!"</h1>
                                 <h2>&mdash; Morse Horse</h2>
                             </hgroup>
-                            <p className="title">Welcome back to <strong>Morse Horse</strong>! Jump back into your Morse.</p>
+                            <p className="title">
+                                Welcome back to <strong>Morse Horse</strong>!
+                                Jump back into your Morse.
+                            </p>
                         </>
                     );
                 const buttonText =
-                    this.state.appState === "unstarted"
-                        ? "Begin!"
-                        : "Resume!";
+                    this.state.appState === "unstarted" ? "Begin!" : "Resume!";
                 return (
                     <BeginView
                         headings={headings}
