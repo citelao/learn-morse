@@ -28,6 +28,8 @@ Here's a shortlist of todo items:
 * [ ] Allow users to test out of letters.
 * [ ] Allow users to focus on problematic letters.
 * [ ] Allow users to change sending speed, gaps, pitch, and pitch separation.
+* [ ] Add remaining favicons for home screens.
+* [ ] Make this a PWA so it can work offline.
 
 ## Release
 
