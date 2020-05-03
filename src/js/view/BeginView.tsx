@@ -67,7 +67,8 @@ export default class BeginView extends React.Component<BeginViewProperties> {
                     Morse Horse is by{" "}
                     <a href="https://ben.stolovitz.com/">Ben Stolovitz</a>.
                     Check it out on{" "}
-                    <a href="https://github.com/citelao/learn-morse">GitHub</a>!
+                    <a href="https://github.com/citelao/learn-morse">GitHub</a>{" "}
+                    (v0.0.9)!
                 </small>
             </section>
         );

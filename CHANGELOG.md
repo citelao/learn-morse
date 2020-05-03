@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.9
+
+- Added: favicons!
+
 ## v0.0.8
 
 - Changed: page title
